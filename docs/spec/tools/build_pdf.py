@@ -27,7 +27,7 @@ PDF_PATH = SPEC_DIR / "PriceRadar-Spec.pdf"
 PNG_DIR = SPEC_DIR / "build" / "pages"
 CSS_PATH = Path(__file__).resolve().parent / "spec.css"
 
-FOOTER_LEFT = "PriceRadar — Technical Specification v1.2"
+FOOTER_LEFT = "PriceRadar — Technical Specification v1.4"
 # h2 sections that always start on a new page (ids produced by the toc extension)
 NEW_PAGE_SECTIONS = ("4-architecture", "13-the-10-day-plan")
 

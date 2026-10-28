@@ -10,4 +10,8 @@
     <ProjectReference Include="..\..\src\PriceRadar.Infrastructure\PriceRadar.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
 </Project>

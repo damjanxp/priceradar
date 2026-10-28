@@ -1,0 +1,1107 @@
+{
+  "source": "fixture",
+  "scopeKey": "fixture:category:knjige",
+  "capturedAtUtc": "2026-11-01T09:00:00Z",
+  "pages": 4,
+  "note": "Invented listings for tests and demos. Not scraped from any marketplace.",
+  "listings": [
+    {
+      "externalId": "L001",
+      "title": "Seobe 2",
+      "author": "Milos Crnjanski",
+      "price": "Cena: 830 dinara",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L001",
+      "postedAtUtc": "2026-09-01T07:00:00Z"
+    },
+    {
+      "externalId": "L002",
+      "title": "HAZARSKI REČNIK",
+      "author": "Milorad Pavić",
+      "price": "Cena: 1.350 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L002",
+      "postedAtUtc": "2026-09-01T14:00:00Z"
+    },
+    {
+      "externalId": "L003",
+      "title": "Koštaa",
+      "author": "Borisav Stanković",
+      "price": "430 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L003",
+      "postedAtUtc": "2026-09-01T21:00:00Z"
+    },
+    {
+      "externalId": "L004",
+      "title": "PESME",
+      "author": "Branko Radičević",
+      "price": "210 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L004",
+      "postedAtUtc": "2026-09-02T04:00:00Z"
+    },
+    {
+      "externalId": "L005",
+      "title": "Orlovi rano lete",
+      "author": "Branko Copic",
+      "price": "370 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L005",
+      "postedAtUtc": "2026-09-02T11:00:00Z"
+    },
+    {
+      "externalId": "L006",
+      "title": "HILJADU ČUDESNIH SUNACA",
+      "author": "Haled Hoseini",
+      "price": "650,00 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L006",
+      "postedAtUtc": "2026-09-02T18:00:00Z"
+    },
+    {
+      "externalId": "L007",
+      "title": "Derviš i smrt",
+      "author": "Selimović Meša",
+      "price": "Cena: 1.040 dinara",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L007",
+      "postedAtUtc": "2026-09-03T01:00:00Z"
+    },
+    {
+      "externalId": "L008",
+      "title": "Danilo Kiš - Bašta, pepeo",
+      "author": null,
+      "price": "Cena: 380 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L008",
+      "postedAtUtc": "2026-09-03T08:00:00Z"
+    },
+    {
+      "externalId": "L009",
+      "title": "Orlovi rano lete, 1977.",
+      "author": "Branko Ćopić",
+      "price": "Cena: 260 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L009",
+      "postedAtUtc": "2026-09-03T15:00:00Z"
+    },
+    {
+      "externalId": "L010",
+      "title": "Ivo Andrić - Prokleta avlija",
+      "author": null,
+      "price": "430 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L010",
+      "postedAtUtc": "2026-09-03T22:00:00Z"
+    },
+    {
+      "externalId": "L011",
+      "title": "Besnilo",
+      "author": "Pekić Borislav",
+      "price": "Cena: 1.120 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L011",
+      "postedAtUtc": "2026-09-04T05:00:00Z"
+    },
+    {
+      "externalId": "L012",
+      "title": "Majstor i Margarita",
+      "author": "Mihail Bulgakov",
+      "price": "Cena: 720 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L012",
+      "postedAtUtc": "2026-09-04T12:00:00Z"
+    },
+    {
+      "externalId": "L013",
+      "title": "Prokleta avlija",
+      "author": "Andrić Ivo",
+      "price": "680,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L013",
+      "postedAtUtc": "2026-09-04T19:00:00Z"
+    },
+    {
+      "externalId": "L014",
+      "title": "Roman o ondonu",
+      "author": "Miloš Crnjanski",
+      "price": "950 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L014",
+      "postedAtUtc": "2026-09-05T02:00:00Z"
+    },
+    {
+      "externalId": "L015",
+      "title": "Roman o Londonu",
+      "author": "Miloš Crnjanski",
+      "price": "Cena: 1.330 dinara",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L015",
+      "postedAtUtc": "2026-09-05T09:00:00Z"
+    },
+    {
+      "externalId": "L016",
+      "title": "Pop Ćira i popSpira",
+      "author": "Stevan Sremac",
+      "price": "370 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L016",
+      "postedAtUtc": "2026-09-05T16:00:00Z"
+    },
+    {
+      "externalId": "L017",
+      "title": "Knjiga za Marka",
+      "author": "Svetlana Velmar-Jankovic",
+      "price": "740 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L017",
+      "postedAtUtc": "2026-09-05T23:00:00Z"
+    },
+    {
+      "externalId": "L018",
+      "title": "Zločin i kazna",
+      "author": null,
+      "price": "510 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L018",
+      "postedAtUtc": "2026-09-06T06:00:00Z"
+    },
+    {
+      "externalId": "L019",
+      "title": "Lovac na zmajeve",
+      "author": null,
+      "price": "Cena: 840 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L019",
+      "postedAtUtc": "2026-09-06T13:00:00Z"
+    },
+    {
+      "externalId": "L020",
+      "title": "Gospođa ministarka",
+      "author": "Nušić Branislav",
+      "price": "240,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L020",
+      "postedAtUtc": "2026-09-06T20:00:00Z"
+    },
+    {
+      "externalId": "L021",
+      "title": "Enciklopedija mrtvih",
+      "author": "Danilo Kiš",
+      "price": "Cena: 490 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L021",
+      "postedAtUtc": "2026-09-07T03:00:00Z"
+    },
+    {
+      "externalId": "L022",
+      "title": "Gorski vijenac",
+      "author": null,
+      "price": "610,00 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L022",
+      "postedAtUtc": "2026-09-07T10:00:00Z"
+    },
+    {
+      "externalId": "L023",
+      "title": "Autobiografija - meki povez",
+      "author": "Branislav Nušić",
+      "price": "Cena: 490 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L023",
+      "postedAtUtc": "2026-09-07T17:00:00Z"
+    },
+    {
+      "externalId": "L024",
+      "title": "Vreme čuda",
+      "author": "Pekić Borislav",
+      "price": "750 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L024",
+      "postedAtUtc": "2026-09-08T00:00:00Z"
+    },
+    {
+      "externalId": "L025",
+      "title": "Nečista krv",
+      "author": "B. Stanković",
+      "price": "530 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L025",
+      "postedAtUtc": "2026-09-08T07:00:00Z"
+    },
+    {
+      "externalId": "L026",
+      "title": "Travnička hronika",
+      "author": null,
+      "price": "520 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L026",
+      "postedAtUtc": "2026-09-08T14:00:00Z"
+    },
+    {
+      "externalId": "L027",
+      "title": "Dnevnik o Čarnojeviću",
+      "author": "M. Crnjanski",
+      "price": "770,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L027",
+      "postedAtUtc": "2026-09-08T21:00:00Z"
+    },
+    {
+      "externalId": "L028",
+      "title": "Dragoslav Mihailović - Kad su cvetale tikve",
+      "author": null,
+      "price": "350 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L028",
+      "postedAtUtc": "2026-09-09T04:00:00Z"
+    },
+    {
+      "externalId": "L029",
+      "title": "Zona Zamfirova",
+      "author": "S. Sremac",
+      "price": "450 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L029",
+      "postedAtUtc": "2026-09-09T11:00:00Z"
+    },
+    {
+      "externalId": "L030",
+      "title": "Pesme",
+      "author": "Branko Radičević",
+      "price": "400 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L030",
+      "postedAtUtc": "2026-09-09T18:00:00Z"
+    },
+    {
+      "externalId": "L031",
+      "title": "BRAĆA KARAMAZOVI",
+      "author": "Fjodor Dostojevski",
+      "price": "650 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L031",
+      "postedAtUtc": "2026-09-10T01:00:00Z"
+    },
+    {
+      "externalId": "L032",
+      "title": "Paulo Koeljo - Alhemičar",
+      "author": null,
+      "price": "340,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L032",
+      "postedAtUtc": "2026-09-10T08:00:00Z"
+    },
+    {
+      "externalId": "L033",
+      "title": "Сеобе",
+      "author": "Милош Црњански",
+      "price": "920 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L033",
+      "postedAtUtc": "2026-09-10T15:00:00Z"
+    },
+    {
+      "externalId": "L034",
+      "title": "Peščank",
+      "author": "Danilo Kiš",
+      "price": "770 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L034",
+      "postedAtUtc": "2026-09-10T22:00:00Z"
+    },
+    {
+      "externalId": "L035",
+      "title": "Хиљаду чудесних сунаца",
+      "author": "Халед Хосеини",
+      "price": "Cena: 1.000 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L035",
+      "postedAtUtc": "2026-09-11T05:00:00Z"
+    },
+    {
+      "externalId": "L036",
+      "title": "Pesme",
+      "author": null,
+      "price": "400 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L036",
+      "postedAtUtc": "2026-09-11T12:00:00Z"
+    },
+    {
+      "externalId": "L037",
+      "title": "Mamac",
+      "author": "Albahari David",
+      "price": "Dogovor",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L037",
+      "postedAtUtc": "2026-09-11T19:00:00Z"
+    },
+    {
+      "externalId": "L038",
+      "title": "Mali princ",
+      "author": "Antoan de Sent Egziperi",
+      "price": "230,00 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L038",
+      "postedAtUtc": "2026-09-12T02:00:00Z"
+    },
+    {
+      "externalId": "L039",
+      "title": "Gospođica",
+      "author": "Ivo Andrić",
+      "price": "250 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L039",
+      "postedAtUtc": "2026-09-12T09:00:00Z"
+    },
+    {
+      "externalId": "L040",
+      "title": "Lovac na zmajeve, 1977.",
+      "author": "Haled Hoseini",
+      "price": "560 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L040",
+      "postedAtUtc": "2026-09-12T16:00:00Z"
+    },
+    {
+      "externalId": "L041",
+      "title": "Bašta sljezove boje",
+      "author": "B. Ćopić",
+      "price": "530 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L041",
+      "postedAtUtc": "2026-09-12T23:00:00Z"
+    },
+    {
+      "externalId": "L042",
+      "title": "Sumnjivo ice",
+      "author": "Branislav Nušić",
+      "price": "Cena: 240 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L042",
+      "postedAtUtc": "2026-09-13T06:00:00Z"
+    },
+    {
+      "externalId": "L043",
+      "title": "Kako upokojiti vampira",
+      "author": "B. Pekić",
+      "price": "840 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L043",
+      "postedAtUtc": "2026-09-13T13:00:00Z"
+    },
+    {
+      "externalId": "L044",
+      "title": "Ana Karenjina",
+      "author": "Lav Tolstoj",
+      "price": "518 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L044",
+      "postedAtUtc": "2026-09-13T20:00:00Z"
+    },
+    {
+      "externalId": "L045",
+      "title": "Mali princ",
+      "author": null,
+      "price": "540 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L045",
+      "postedAtUtc": "2026-09-14T03:00:00Z"
+    },
+    {
+      "externalId": "L046",
+      "title": "SEOBE 2",
+      "author": "Miloš Crnjanski",
+      "price": "980 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L046",
+      "postedAtUtc": "2026-09-14T10:00:00Z"
+    },
+    {
+      "externalId": "L047",
+      "title": "Hazarski rečnik",
+      "author": null,
+      "price": "Cena: 740 dinara",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L047",
+      "postedAtUtc": "2026-09-14T17:00:00Z"
+    },
+    {
+      "externalId": "L048",
+      "title": "Коштана",
+      "author": "Борисав Станковић",
+      "price": "380 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L048",
+      "postedAtUtc": "2026-09-15T00:00:00Z"
+    },
+    {
+      "externalId": "L049",
+      "title": "Pesme, 1977.",
+      "author": "Branko Radičević",
+      "price": "400 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L049",
+      "postedAtUtc": "2026-09-15T07:00:00Z"
+    },
+    {
+      "externalId": "L050",
+      "title": "Горски вијенац",
+      "author": "Петар Петровић Његош",
+      "price": "380,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L050",
+      "postedAtUtc": "2026-09-15T14:00:00Z"
+    },
+    {
+      "externalId": "L051",
+      "title": "Hiljadu čudesnih sunaca",
+      "author": "H. Hoseini",
+      "price": "1.040 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L051",
+      "postedAtUtc": "2026-09-15T21:00:00Z"
+    },
+    {
+      "externalId": "L052",
+      "title": "Derviš i smrt",
+      "author": "M. Selimović",
+      "price": "Cena: 510 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L052",
+      "postedAtUtc": "2026-09-16T04:00:00Z"
+    },
+    {
+      "externalId": "L053",
+      "title": "Bašta, pepeo",
+      "author": "D. Kiš",
+      "price": "Cena: 400 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L053",
+      "postedAtUtc": "2026-09-16T11:00:00Z"
+    },
+    {
+      "externalId": "L054",
+      "title": "Orlovi rano lete",
+      "author": "Branko Copic",
+      "price": "510 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L054",
+      "postedAtUtc": "2026-09-16T18:00:00Z"
+    },
+    {
+      "externalId": "L055",
+      "title": "Tvrđava",
+      "author": "M. Selimović",
+      "price": "690 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L055",
+      "postedAtUtc": "2026-09-17T01:00:00Z"
+    },
+    {
+      "externalId": "L056",
+      "title": "Besnilo",
+      "author": "Borislav Pekić",
+      "price": "710 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L056",
+      "postedAtUtc": "2026-09-17T08:00:00Z"
+    },
+    {
+      "externalId": "L057",
+      "title": "Majstor i Margarita",
+      "author": null,
+      "price": "Cena: 900 dinara",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L057",
+      "postedAtUtc": "2026-09-17T15:00:00Z"
+    },
+    {
+      "externalId": "L058",
+      "title": "Prokleta avlija",
+      "author": "Ivo Andric",
+      "price": "550,00 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L058",
+      "postedAtUtc": "2026-09-17T22:00:00Z"
+    },
+    {
+      "externalId": "L059",
+      "title": "Romano Londonu",
+      "author": "Miloš Crnjanski",
+      "price": "Cena: 990 dinara",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L059",
+      "postedAtUtc": "2026-09-18T05:00:00Z"
+    },
+    {
+      "externalId": "L060",
+      "title": "Seobe - kao nova",
+      "author": "Miloš Crnjanski",
+      "price": "1.240 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L060",
+      "postedAtUtc": "2026-09-18T12:00:00Z"
+    },
+    {
+      "externalId": "L061",
+      "title": "Pop Ćira i pop Spira",
+      "author": "Stevan Sremac",
+      "price": "480 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L061",
+      "postedAtUtc": "2026-09-18T19:00:00Z"
+    },
+    {
+      "externalId": "L062",
+      "title": "Knjiga za Marka",
+      "author": null,
+      "price": "Cena: 550 dinara",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L062",
+      "postedAtUtc": "2026-09-19T02:00:00Z"
+    },
+    {
+      "externalId": "L063",
+      "title": "Zločin i kazna odlično očuvana",
+      "author": "Fjodor Dostojevski",
+      "price": "460,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L063",
+      "postedAtUtc": "2026-09-19T09:00:00Z"
+    },
+    {
+      "externalId": "L064",
+      "title": "Lovac na zmajeve",
+      "author": "Haled Hoseini",
+      "price": "",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L064",
+      "postedAtUtc": "2026-09-19T16:00:00Z"
+    },
+    {
+      "externalId": "L065",
+      "title": "Na Drini ćuprija",
+      "author": "Ivo Andrić",
+      "price": "490 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L065",
+      "postedAtUtc": "2026-09-19T23:00:00Z"
+    },
+    {
+      "externalId": "L066",
+      "title": "Enciklopedija mrtvih",
+      "author": "Danilo Kis",
+      "price": "Cena: 450 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L066",
+      "postedAtUtc": "2026-09-20T06:00:00Z"
+    },
+    {
+      "externalId": "L067",
+      "title": "Petar Petrović Njegoš - Gorski vijenac",
+      "author": null,
+      "price": "Cena: 550 dinara",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L067",
+      "postedAtUtc": "2026-09-20T13:00:00Z"
+    },
+    {
+      "externalId": "L068",
+      "title": "Autobiografija",
+      "author": "Nušić Branislav",
+      "price": "410 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L068",
+      "postedAtUtc": "2026-09-20T20:00:00Z"
+    },
+    {
+      "externalId": "L069",
+      "title": "Vreme čuda",
+      "author": "Pekić Borislav",
+      "price": "1.030 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L069",
+      "postedAtUtc": "2026-09-21T03:00:00Z"
+    },
+    {
+      "externalId": "L070",
+      "title": "Besnilo, 1977.",
+      "author": "Borislav Pekić",
+      "price": "670,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L070",
+      "postedAtUtc": "2026-09-21T10:00:00Z"
+    },
+    {
+      "externalId": "L071",
+      "title": "Travnička hronika",
+      "author": "Andrić Ivo",
+      "price": "890,00 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L071",
+      "postedAtUtc": "2026-09-21T17:00:00Z"
+    },
+    {
+      "externalId": "L072",
+      "title": "Dnevnik o Čarnojeviću - meki povez",
+      "author": "Miloš Crnjanski",
+      "price": "780 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L072",
+      "postedAtUtc": "2026-09-22T00:00:00Z"
+    },
+    {
+      "externalId": "L073",
+      "title": "Kad su cvetale tikve",
+      "author": "Mihailović Dragoslav",
+      "price": "460 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L073",
+      "postedAtUtc": "2026-09-22T07:00:00Z"
+    },
+    {
+      "externalId": "L074",
+      "title": "ZONA ZAMFIROVA",
+      "author": "Stevan Sremac",
+      "price": "350 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L074",
+      "postedAtUtc": "2026-09-22T14:00:00Z"
+    },
+    {
+      "externalId": "L075",
+      "title": "Majstor i Margarita",
+      "author": "Mihail Bulgakov",
+      "price": "500 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L075",
+      "postedAtUtc": "2026-09-22T21:00:00Z"
+    },
+    {
+      "externalId": "L076",
+      "title": "Braća Karamzovi",
+      "author": "Fjodor Dostojevski",
+      "price": "1.420,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L076",
+      "postedAtUtc": "2026-09-23T04:00:00Z"
+    },
+    {
+      "externalId": "L077",
+      "title": "Alhemičar",
+      "author": "Koeljo Paulo",
+      "price": "530,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L077",
+      "postedAtUtc": "2026-09-23T11:00:00Z"
+    },
+    {
+      "externalId": "L078",
+      "title": "Seobe",
+      "author": "Crnjanski Miloš",
+      "price": "780 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L078",
+      "postedAtUtc": "2026-09-23T18:00:00Z"
+    },
+    {
+      "externalId": "L079",
+      "title": "Пешчаник",
+      "author": "Данило Киш",
+      "price": "550 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L079",
+      "postedAtUtc": "2026-09-24T01:00:00Z"
+    },
+    {
+      "externalId": "L080",
+      "title": "Кад су цветале тикве",
+      "author": "Драгослав Михаиловић",
+      "price": "410 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L080",
+      "postedAtUtc": "2026-09-24T08:00:00Z"
+    },
+    {
+      "externalId": "L081",
+      "title": "Pesme",
+      "author": null,
+      "price": "430,00 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L081",
+      "postedAtUtc": "2026-09-24T15:00:00Z"
+    },
+    {
+      "externalId": "L082",
+      "title": "Мамац",
+      "author": "Давид Албахари",
+      "price": "Cena: 770 dinara",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L082",
+      "postedAtUtc": "2026-09-24T22:00:00Z"
+    },
+    {
+      "externalId": "L083",
+      "title": "Мали принц",
+      "author": "Антоан де Сент Егзипери",
+      "price": "Cena: 400 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L083",
+      "postedAtUtc": "2026-09-25T05:00:00Z"
+    },
+    {
+      "externalId": "L084",
+      "title": "Ivo Andrić - Gospođica",
+      "author": null,
+      "price": "490,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L084",
+      "postedAtUtc": "2026-09-25T12:00:00Z"
+    },
+    {
+      "externalId": "L085",
+      "title": "Hiljadu čudesnih sunaca",
+      "author": "Haled Hoseini",
+      "price": "800 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L085",
+      "postedAtUtc": "2026-09-25T19:00:00Z"
+    },
+    {
+      "externalId": "L086",
+      "title": "Bašta sljezove boje",
+      "author": "Branko Ćopić",
+      "price": "Cena: 710 dinara",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L086",
+      "postedAtUtc": "2026-09-26T02:00:00Z"
+    },
+    {
+      "externalId": "L087",
+      "title": "Sumnjivo lice",
+      "author": "Nušić Branislav",
+      "price": "390,00 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L087",
+      "postedAtUtc": "2026-09-26T09:00:00Z"
+    },
+    {
+      "externalId": "L088",
+      "title": "Kako upokojiti vampira",
+      "author": null,
+      "price": "0 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L088",
+      "postedAtUtc": "2026-09-26T16:00:00Z"
+    },
+    {
+      "externalId": "L089",
+      "title": "Lav Tolstoj - Ana Karenjina",
+      "author": null,
+      "price": "770 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L089",
+      "postedAtUtc": "2026-09-26T23:00:00Z"
+    },
+    {
+      "externalId": "L090",
+      "title": "Lovacna zmajeve",
+      "author": "Haled Hoseini",
+      "price": "470 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L090",
+      "postedAtUtc": "2026-09-27T06:00:00Z"
+    },
+    {
+      "externalId": "L091",
+      "title": "Seobe 2",
+      "author": "M. Crnjanski",
+      "price": "1.340,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L091",
+      "postedAtUtc": "2026-09-27T13:00:00Z"
+    },
+    {
+      "externalId": "L092",
+      "title": "Hazarski rečnik",
+      "author": "Milorad Pavić",
+      "price": "1.120 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L092",
+      "postedAtUtc": "2026-09-27T20:00:00Z"
+    },
+    {
+      "externalId": "L093",
+      "title": "Borisav Stanković - Koštana",
+      "author": null,
+      "price": "340,00 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L093",
+      "postedAtUtc": "2026-09-28T03:00:00Z"
+    },
+    {
+      "externalId": "L094",
+      "title": "Pesme",
+      "author": "Branko Radicevic",
+      "price": "560 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L094",
+      "postedAtUtc": "2026-09-28T10:00:00Z"
+    },
+    {
+      "externalId": "L095",
+      "title": "Alhmičar",
+      "author": "Paulo Koeljo",
+      "price": "530 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L095",
+      "postedAtUtc": "2026-09-28T17:00:00Z"
+    },
+    {
+      "externalId": "L096",
+      "title": "Hiljadu čudesnih sunaca",
+      "author": null,
+      "price": "Cena: 1.020 dinara",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L096",
+      "postedAtUtc": "2026-09-29T00:00:00Z"
+    },
+    {
+      "externalId": "L097",
+      "title": "Derviš i smrt",
+      "author": null,
+      "price": "460 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L097",
+      "postedAtUtc": "2026-09-29T07:00:00Z"
+    },
+    {
+      "externalId": "L098",
+      "title": "Danilo Kiš - Bašta, pepeo",
+      "author": null,
+      "price": "630,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L098",
+      "postedAtUtc": "2026-09-29T14:00:00Z"
+    },
+    {
+      "externalId": "L099",
+      "title": "Orlovi ranolete",
+      "author": "Branko Ćopić",
+      "price": "396 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L099",
+      "postedAtUtc": "2026-09-29T21:00:00Z"
+    },
+    {
+      "externalId": "L100",
+      "title": "Orlovi rano lete",
+      "author": null,
+      "price": "310 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L100",
+      "postedAtUtc": "2026-09-30T04:00:00Z"
+    },
+    {
+      "externalId": "L101",
+      "title": "BESNILO",
+      "author": "Borislav Pekić",
+      "price": "1.180 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L101",
+      "postedAtUtc": "2026-09-30T11:00:00Z"
+    },
+    {
+      "externalId": "L102",
+      "title": "Majstor i Margarita",
+      "author": "Bulgakov Mihail",
+      "price": "Cena: 670 dinara",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L102",
+      "postedAtUtc": "2026-09-30T18:00:00Z"
+    },
+    {
+      "externalId": "L103",
+      "title": "Prokleta avlija",
+      "author": null,
+      "price": "280,00 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L103",
+      "postedAtUtc": "2026-10-01T01:00:00Z"
+    },
+    {
+      "externalId": "L104",
+      "title": "Роман о Лондону",
+      "author": "Милош Црњански",
+      "price": "530 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L104",
+      "postedAtUtc": "2026-10-01T08:00:00Z"
+    },
+    {
+      "externalId": "L105",
+      "title": "Zona Zamfirova",
+      "author": "Stevan Sremac",
+      "price": "290 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L105",
+      "postedAtUtc": "2026-10-01T15:00:00Z"
+    },
+    {
+      "externalId": "L106",
+      "title": "Pop Ćirai pop Spira",
+      "author": "Stevan Sremac",
+      "price": "250,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L106",
+      "postedAtUtc": "2026-10-01T22:00:00Z"
+    },
+    {
+      "externalId": "L107",
+      "title": "Knjiga za Marka",
+      "author": "Svetlana Velmar-Jankovic",
+      "price": "880 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L107",
+      "postedAtUtc": "2026-10-02T05:00:00Z"
+    },
+    {
+      "externalId": "L108",
+      "title": "Zločin i kazna NOVO",
+      "author": "Fjodor Dostojevski",
+      "price": "540 din",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L108",
+      "postedAtUtc": "2026-10-02T12:00:00Z"
+    },
+    {
+      "externalId": "L109",
+      "title": "Lovac na zmajeve",
+      "author": "H. Hoseini",
+      "price": "910 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L109",
+      "postedAtUtc": "2026-10-02T19:00:00Z"
+    },
+    {
+      "externalId": "L110",
+      "title": "Pop Ćira i pop Spira",
+      "author": "S. Sremac",
+      "price": "530,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L110",
+      "postedAtUtc": "2026-10-03T02:00:00Z"
+    },
+    {
+      "externalId": "L113",
+      "title": "Branislav Nušić - Autobiografija",
+      "author": null,
+      "price": "Cena: 460 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L113",
+      "postedAtUtc": "2026-10-03T23:00:00Z"
+    },
+    {
+      "externalId": "L114",
+      "title": "Borislav Pekić - Vreme čuda",
+      "author": null,
+      "price": "980 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L114",
+      "postedAtUtc": "2026-10-04T06:00:00Z"
+    },
+    {
+      "externalId": "L121",
+      "title": "Braća Karamazovi odlično očuvana",
+      "author": "Fjodor Dostojevski",
+      "price": "1.060 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L121",
+      "postedAtUtc": "2026-10-06T07:00:00Z"
+    },
+    {
+      "externalId": "L122",
+      "title": "Alhemičar",
+      "author": "Paulo Koeljo",
+      "price": "520,00 RSD",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L122",
+      "postedAtUtc": "2026-10-06T14:00:00Z"
+    },
+    {
+      "externalId": "L123",
+      "title": "Miloš Crnjanski - Seobe",
+      "author": null,
+      "price": "560 RSD",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L123",
+      "postedAtUtc": "2026-10-06T21:00:00Z"
+    },
+    {
+      "externalId": "L124",
+      "title": "Peščanik",
+      "author": "Kiš Danilo",
+      "price": "670,00 RSD",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L124",
+      "postedAtUtc": "2026-10-07T04:00:00Z"
+    },
+    {
+      "externalId": "L125",
+      "title": "Госпођа министарка",
+      "author": "Бранислав Нушић",
+      "price": "Cena: 180 dinara",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L125",
+      "postedAtUtc": "2026-10-07T11:00:00Z"
+    },
+    {
+      "externalId": "L126",
+      "title": "Песме",
+      "author": "Десанка Максимовић",
+      "price": "Cena: 370 dinara",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L126",
+      "postedAtUtc": "2026-10-07T18:00:00Z"
+    },
+    {
+      "externalId": "L127",
+      "title": "Mamac",
+      "author": "D. Albahari",
+      "price": "730 RSD",
+      "condition": "Dobro",
+      "url": "https://fixture.priceradar.local/listing/L127",
+      "postedAtUtc": "2026-10-08T01:00:00Z"
+    },
+    {
+      "externalId": "L128",
+      "title": "Mali princ",
+      "author": "Antoan de Sent Egziperi",
+      "price": "220 din",
+      "condition": "Odlično",
+      "url": "https://fixture.priceradar.local/listing/L128",
+      "postedAtUtc": "2026-10-08T08:00:00Z"
+    },
+    {
+      "externalId": "L129",
+      "title": "Gospođica odlično očuvana",
+      "author": "Ivo Andrić",
+      "price": "250 din",
+      "condition": null,
+      "url": "https://fixture.priceradar.local/listing/L129",
+      "postedAtUtc": "2026-10-08T15:00:00Z"
+    },
+    {
+      "externalId": "L130",
+      "title": "Besnilo NOVO",
+      "author": "Borislav Pekić",
+      "price": "920 din",
+      "condition": "Vrlo dobro",
+      "url": "https://fixture.priceradar.local/listing/L130",
+      "postedAtUtc": "2026-10-08T22:00:00Z"
+    }
+  ]
+}

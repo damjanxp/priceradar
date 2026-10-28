@@ -92,6 +92,16 @@ public class ModelTests
     }
 
     [Fact]
+    public void Sources_KupujemProdajemIsFixtureOnly()
+    {
+        // D-39: KP's terms forbid scraping; it must never be seeded as a live source.
+        var kp = Model.FindEntityType(typeof(Source))!.GetSeedData().Single(s => (string)s[nameof(Source.Code)]! == "kp");
+
+        ((SourceKind)kp[nameof(Source.Kind)]!).ShouldBe(SourceKind.Fixture);
+        kp[nameof(Source.BaseUrl)].ShouldBeNull();
+    }
+
+    [Fact]
     public void DimDateSeedScript_IsEmbedded()
     {
         SqlResource.Load("Seed/dw.DimDate.sql").ShouldContain("INSERT INTO dw.DimDate");

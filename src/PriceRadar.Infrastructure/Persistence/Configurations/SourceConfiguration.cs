@@ -20,11 +20,12 @@ internal sealed class SourceConfiguration : IEntityTypeConfiguration<Source>
 
         builder.HasIndex(x => x.Code).IsUnique().HasDatabaseName("UX_Source_Code");
 
-        // Live sources ship disabled (spec §4.5).
+        // Live sources ship disabled (spec §4.5). KupujemProdajem forbids scraping, so "kp" replays invented
+        // fixtures instead of being a live source (D-39).
         builder.HasData(
             new Source { SourceId = 1, Code = "fixture", Name = "Fixture files", Kind = SourceKind.Fixture, IsEnabled = true, MinDelayMs = 0, CreatedAtUtc = SeededAtUtc },
             new Source { SourceId = 2, Code = "synthetic", Name = "Synthetic generator", Kind = SourceKind.Synthetic, IsEnabled = true, MinDelayMs = 0, CreatedAtUtc = SeededAtUtc },
             new Source { SourceId = 3, Code = "kupindo", Name = "Kupindo", Kind = SourceKind.Live, BaseUrl = "https://www.kupindo.com", IsEnabled = false, MinDelayMs = 4000, CreatedAtUtc = SeededAtUtc },
-            new Source { SourceId = 4, Code = "kp", Name = "KupujemProdajem", Kind = SourceKind.Live, BaseUrl = "https://www.kupujemprodajem.com", IsEnabled = false, MinDelayMs = 4000, CreatedAtUtc = SeededAtUtc });
+            new Source { SourceId = 4, Code = "kp", Name = "KupujemProdajem-style fixtures", Kind = SourceKind.Fixture, IsEnabled = true, MinDelayMs = 0, CreatedAtUtc = SeededAtUtc });
     }
 }

@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.2 |
+| Version | 1.4 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,8 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.4 | 2026-10-28 | D. Petrov / Claude | DAY-2 results folded in: Zipf–Mandelbrot skew (q = 10), measured seed output, `sqlcmd -I` failure symptom |
+| 1.3 | 2026-10-28 | D. Petrov / Claude | KupujemProdajem becomes a synthetic fixture source (its ToS §11 forbids scraping); live Kupindo limited to category pages (robots.txt blocks search); D-37 revised, D-39 added |
 
 ### 1.2 Conventions used in this document
 
@@ -34,7 +36,7 @@
 ### 1.3 Pre-Day-1 decisions (confirmed 2026-10-28)
 
 1. **.NET 9 vs .NET 10 LTS** (see D-01). .NET 9 is an STS release whose support ends in November 2026; the job ad asks for .NET 9, so the MVP targets `net9.0`, and retargeting to `net10.0` is a Stretch item. **Confirmed** (D-01).
-2. **Which live marketplace?** The MVP ships one *optional* live source, Kupindo (book-centric). KupujemProdajem is fixture-only unless its Terms of Use are verified to allow automated access (see §4.5 and R-10). **Confirmed** (D-37).
+2. **Which live marketplace?** The MVP ships one *optional* live source, Kupindo (book-centric), limited to category pages. KupujemProdajem's Terms of Use (§11) forbid manual or automated scraping, so it is represented by a KP-style **synthetic** fixture source only (see §4.5 and R-10). **Confirmed** (D-37, D-39).
 3. **Phone access at the market.** A phone at a flea market cannot reach `localhost`. The MVP is usable on home Wi-Fi or through a tunnel (`devtunnel`/`cloudflared`); a real public URL needs the Azure Stretch item. **Confirmed** as sufficient for the CV demo (D-38).
 
 ## 2. Executive summary, goals and non-goals
@@ -76,7 +78,7 @@ S-1 Azure deployment (App Service + Azure SQL free offer) · S-2 second live sou
 
 | ID | Requirement | Priority | Verified by |
 |---|---|---|---|
-| FR-1 | The system shall support multiple listing sources behind `IListingSource`; the MVP includes `fixture`, `synthetic` and an optional, disabled-by-default `kupindo` source. | Must | Unit + integration tests |
+| FR-1 | The system shall support multiple listing sources behind `IListingSource`; the MVP includes `fixture`, `kp` (KP-style synthetic fixtures), `synthetic` and an optional, disabled-by-default `kupindo` source (category pages only). | Must | Unit + integration tests |
 | FR-2 | A user shall trigger an ingestion run via `POST /api/ingestion/runs` (source, optional query, max pages). The run executes asynchronously in the Worker. | Must | API test, Hangfire dashboard |
 | FR-3 | Only one run per source may be active at a time; a second request returns `409 Conflict`. | Must | Integration test |
 | FR-4 | Every fetched listing shall be written unchanged (raw text) to `ingest.StagingListing` before any transformation. | Must | SQL check |
@@ -197,14 +199,15 @@ public interface IListingSource
 
 | Source | Ships in public repo | Enabled by default | Purpose |
 |---|---|---|---|
-| `FixtureListingSource` | Yes — reads `tests/fixtures/sources/fixture/run-00N.json` | Yes | Deterministic demos and tests, including the 3-run sold-heuristic scenario |
+| `FixtureListingSource` (`fixture`) | Yes — reads `tests/fixtures/sources/fixture/run-00N.json` | Yes | Deterministic demos and tests, including the 3-run sold-heuristic scenario |
+| `FixtureListingSource` (`kp`) | Yes — reads `tests/fixtures/sources/kp/run-00N.json`; **invented** ads in KupujemProdajem's style (EUR prices, "Dogovor", KP condition labels) | Yes | Second marketplace: cross-source matching, EUR→RSD conversion, per-source stats. No real KP content (D-39) |
 | `SyntheticListingSource` | Yes — generator with seed | Yes | Volume testing; same generator as the Seeder |
-| `KupindoListingSource` | Yes (code) — "for personal local use" banner in README | **No** (`Sources:Kupindo:Enabled=false`) | Real data on my own machine only |
+| `KupindoListingSource` | Yes (code) — "for personal local use" banner in README | **No** (`Sources:Kupindo:Enabled=false`) | Real data on my own machine only; **category pages only** — Kupindo's robots.txt disallows `/pretraga*.php` (search), `/*/Sledeci`, `/*/cena_ASC`, `/*/cena_DESC` and `/kupljeno/*` |
 
 **Rules every live source must follow** (enforced in a shared `PoliteHttpHandler` + a review checklist):
 
 1. Fetch and obey `robots.txt` (cached 24 h); disallowed paths → abort the run with `RobotsDisallowed`.
-2. Read and respect the site's Terms of Use. If automated access is prohibited, the source stays fixture-only (applies to KupujemProdajem until verified — D-37).
+2. Read and respect the site's Terms of Use. If automated access is prohibited, the source stays fixture-only. Checked 2026-10-28: KupujemProdajem §11 forbids *"ručno ili softversko, neovlašćeno kopiranje i skrejpovanje"* of ads → synthetic fixtures only (D-39). Limundo/Kupindo terms forbid overloading the site and republishing content without consent → personal local use, never published (D-37).
 3. Rate limit: one request at a time per host, ≥ `MinDelayMs` (default 4,000 ms) between requests, ≤ `MaxPages` (10) per run; manual trigger only.
 4. Identifiable User-Agent: `PriceRadar/0.1 (+https://github.com/<user>/priceradar; personal non-commercial research)`.
 5. Back off on 429/503 (honour `Retry-After`); stop the run on 403 or CAPTCHA pages, and **never** attempt to bypass them.
@@ -249,7 +252,7 @@ Keys: **PK** primary key, **FK** foreign key, **UQ** unique. All `...AtUtc` colu
 |---|---|---|---|
 | ScrapeRunId | bigint identity | no | PK |
 | SourceId | tinyint | no | FK → Source |
-| ScopeKey | varchar(200) | no | Canonical scope, e.g. `kupindo:q:andric` or `fixture:category:knjige`; used by the sold heuristic |
+| ScopeKey | varchar(200) | no | Canonical scope, e.g. `kupindo:category:domaci-pisci` or `fixture:category:knjige`; used by the sold heuristic |
 | Query | nvarchar(200) | yes | Free-text query, if any |
 | Status | tinyint | no | [0 Queued, 1 Running, 2 Succeeded, 3 Failed, 4 Cancelled] |
 | Stage | tinyint | no | [0 Created, 1 Scraped, 2 Matched, 3 Resolved, 4 Loaded] — the last completed step |
@@ -552,8 +555,9 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 - Disappearance ≠ sale: sellers delete ads, ads expire (Kupindo auctions end on a date), moderators remove them.
 - Re-listing creates a new `ExternalId`, giving one false "sold" and one new listing (partly mitigated: a disappeared and a new listing with the same book, source and price within 7 days can be flagged as a probable re-list — Stretch).
 - Incomplete runs (page cap hit, network errors) would produce false disappearances. They are excluded via `IsComplete`.
-- Query-scoped runs only see listings that match the query. Presence is therefore evaluated per `ScopeKey`, and a listing first seen under a different scope is never penalised.
-- Search ranking can push listings beyond the page cap. This is reduced by sorting by "newest" where the site allows it, and documented as residual risk.
+- Different scopes see different listings (fixture/synthetic runs may be query-scoped; live Kupindo runs are category pages only, because its robots.txt disallows search). Presence is therefore evaluated per `ScopeKey`, and a listing first seen under a different scope is never penalised.
+- Kupindo's own "sold" pages (`/kupljeno/*`) are disallowed by robots.txt, so they cannot be used to validate the proxy.
+- Category ordering can push listings beyond the page cap (price-sorted URLs are disallowed on Kupindo). Such runs are marked incomplete and excluded; this is documented as residual risk.
 - With manual, irregular runs, "N consecutive runs" spans unknown time. `DisappearedAtUtc` is the run time, not the sale time.
 
 ## 8. REST API specification
@@ -759,7 +763,7 @@ Options are bound to classes with `ValidateDataAnnotations().ValidateOnStart()`,
 `dotnet run --project tools/PriceRadar.Seeder -c Release -- seed --books 20000 --listings 60000 --snapshots 500000 --days 180 --seed 42`
 
 - Book titles come from a word-list grammar plus about 300 real classic titles/authors from Serbian literature (public metadata only). Prices are log-normal per book (median 300–2,500 RSD).
-- **Zipf-distributed popularity** (s ≈ 1.1): a few books have thousands of snapshots and most have a handful. This is realistic, and it creates the *parameter sniffing* case that DAY-6 investigates.
+- **Zipf–Mandelbrot popularity**, weight `1 / (rank + 10)^1.1` over a random rank order: the top books have thousands of snapshots (8,275 for the hottest with `--seed 42`) and the median book has 14. A plain Zipf (offset 0) was rejected after measuring it: one book got 15 % of all snapshots. The skew is realistic, and it creates the *parameter sniffing* case that DAY-6 investigates.
 - It creates 180 synthetic `ScrapeRun` rows (source `synthetic`) and writes Book → Listing → PriceSnapshot with `SqlBulkCopy` (`TableLock`, `BatchSize = 10,000`, streaming `IDataReader`), so memory stays flat.
 - Output: elapsed time per table, logged and copied into `BENCHMARKS.md`. Hot/cold book IDs are printed for the benchmarks (`hot = most snapshots`, `cold = median snapshots`).
 
@@ -893,7 +897,7 @@ SELECT s.name AS [schema], t.name AS [table]
 FROM sys.tables t JOIN sys.schemas s ON s.schema_id = t.schema_id
 WHERE s.name IN ('ingest','dw','match') ORDER BY 1, 2;          -- 8 rows
 SELECT COUNT(*) FROM dw.DimDate;                                 -- 2557
-SELECT Code, Kind, IsEnabled FROM ingest.Source;                 -- fixture, synthetic, kupindo(0), kp(0)
+SELECT Code, Kind, IsEnabled FROM ingest.Source;                 -- fixture, synthetic, kupindo(Live, 0), kp (Live, 0 → Fixture, 1 on DAY-2)
 SELECT MigrationId FROM dbo.__EFMigrationsHistory;               -- …_InitialSchema
 ```
 
@@ -924,7 +928,8 @@ SELECT MigrationId FROM dbo.__EFMigrationsHistory;               -- …_InitialS
 - [ ] `StagingBulkWriter` (SqlBulkCopy, batch 1,000, explicit column mappings) + `PriceParser` with unit tests (1.5 h)
 - [ ] Seeder CLI `seed` command: Zipf books → listings → snapshots, streaming `IDataReader`, `TableLock` (2 h)
 - [ ] Seeder `stage-fixture` command (runs a source into staging without Hangfire) (0.5 h)
-- [ ] `KupindoListingSource` skeleton with `PoliteHttpHandler` (robots.txt, delay, UA), disabled by default — *cuttable* (1.5 h)
+- [ ] KP-style fixture `tests/fixtures/sources/kp/run-001.json` (~40 invented ads overlapping the fixture books) + migration turning the `kp` source row into a fixture source (0.5 h)
+- [ ] `KupindoListingSource` skeleton with `PoliteHttpHandler` (robots.txt, delay, UA), category pages only, disabled by default — *cuttable* (1.5 h)
 
 **Deliverables:** `tests/fixtures/sources/fixture/run-00{1,2,3}.json`, `tools/PriceRadar.Seeder`, `PriceParserTests`, `docs/benchmarks/BENCHMARKS.md` (seed timing section).
 
@@ -942,15 +947,17 @@ SELECT MigrationId FROM dbo.__EFMigrationsHistory;               -- …_InitialS
 ```powershell
 dotnet test tests/PriceRadar.UnitTests --filter "FullyQualifiedName~PriceParser"
 dotnet run --project tools/PriceRadar.Seeder -c Release -- seed --books 20000 --listings 60000 --snapshots 500000 --days 180 --seed 42
-# expected tail (IDs are examples):  Books 20000 (x.x s) | Listings 60000 (x.x s) | Snapshots 500000 (xx.x s) | hot=17 cold=9312
+# measured: Snapshots 500,000 rows 7.8 s | Done in 10.5 s | hot=6442 (8275 snapshots) cold=13212 (14, median)
+# re-run with --reset: identical counts and top 5 (6442, 2201, 13873, 17304, 2144)
 dotnet run --project tools/PriceRadar.Seeder -- stage-fixture --set run-001
+dotnet run --project tools/PriceRadar.Seeder -- stage-fixture --set run-001 --source kp   # 40 KP-style rows
 ```
 
 ```sql
 SELECT (SELECT COUNT(*) FROM dw.Book) AS Books, (SELECT COUNT(*) FROM dw.Listing) AS Listings,
        (SELECT COUNT(*) FROM dw.PriceSnapshot) AS Snapshots;                 -- 20000 / 60000 / 500000
 SELECT TOP 5 BookId, COUNT(*) AS Snaps FROM dw.PriceSnapshot
-GROUP BY BookId ORDER BY Snaps DESC;                                         -- skew: thousands vs median ~10–25
+GROUP BY BookId ORDER BY Snaps DESC;                                         -- skew: thousands vs median 14
 SELECT ScrapeRunId, ProcessStatus, COUNT(*) FROM ingest.StagingListing
 GROUP BY ScrapeRunId, ProcessStatus;                                         -- run-001: 120 rows, status 0
 SELECT TOP 10 RawTitle, RawAuthor, RawPrice FROM ingest.StagingListing;      -- Cyrillic intact (nvarchar!)
@@ -964,6 +971,8 @@ SELECT TOP 10 RawTitle, RawAuthor, RawPrice FROM ingest.StagingListing;      -- 
 - *"The given ColumnMapping does not match up with any column"* → mappings by ordinal; use explicit name mappings.
 - *"Violation of UNIQUE KEY UX_PriceSnapshot_Listing_Run"* → the generator emits two snapshots for one listing in one run; derive runs per listing without repetition.
 - Seeding takes minutes → no `TableLock`, a small `BatchSize`, or a `DataTable` materialising everything; stream with `IDataReader`.
+- `sqlcmd` write fails with *Msg 1934 … QUOTED_IDENTIFIER* → `sqlcmd` defaults to `QUOTED_IDENTIFIER OFF`, which filtered indexes and computed-column indexes forbid; add `-I`.
+- Foreign keys show `is_not_trusted = 1` after seeding → SqlBulkCopy ran without `CheckConstraints`.
 
 **Cut-if-late:** Drop the Kupindo skeleton (it becomes the "extra scraper" in the cut order). Never cut the fixtures; DAY-3 tests depend on them.
 
@@ -1469,8 +1478,9 @@ Final smoke checklist: `/health/ready` Healthy · one fixture run Succeeded · l
 | D-34 | DataAnnotations validation + ProblemDetails (RFC 9457) | FluentValidation | Fewer dependencies; enough for query-parameter rules | Complex cross-field rules need custom attributes |
 | D-35 | **k6 via Docker** for HTTP latency; `STATISTICS IO/TIME` + saved plans for SQL | BenchmarkDotNet; JMeter | Each tool measures the layer it is best at; nothing to install | Two measurement methods to document |
 | D-36 | **Offset pagination** (`page`/`pageSize`, max 100) | Keyset/cursor | Small result sets; simpler clients | Deep pages are slower (S-6) |
-| D-37 | Live scraping limited to **Kupindo** (optional, off by default); **KupujemProdajem fixture-only** until its Terms of Use are verified | Live scrapers for both sites | One live source is enough to show the pattern; avoids ToS risk on a public repo | Less real data from the biggest marketplace |
+| D-37 | Live scraping limited to **Kupindo**, optional and off by default, **category pages only** (robots.txt disallows search, pagination links, price sorting and sold pages) | Live scrapers for both sites; search-based Kupindo runs | One live source shows the pattern; robots.txt and ToS are respected literally | No ad-hoc title search on live data; coverage limited to the page cap |
 | D-38 | Phone access via **home Wi-Fi or a dev tunnel** for the MVP; public hosting = Azure Stretch (S-1) | Deploy to Azure in the MVP | Keeps the 10 days on backend work; a tunnel is enough for a demo GIF | Not usable at the market without a tunnel or S-1 |
+| D-39 | **KupujemProdajem as a synthetic fixture source** (`kp`): invented ads in KP's format; no KP scraper, no copied KP ads | A disabled KP scraper; hand-copied KP ads as fixtures | KP ToS §11 forbids manual and automated copying/scraping; a ToS-violating scraper in a public CV repo is a liability | KP data is not real; a live KP source needs written permission or an official API |
 
 ## Appendix A — README outline
 

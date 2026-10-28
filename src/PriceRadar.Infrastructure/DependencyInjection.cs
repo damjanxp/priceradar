@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PriceRadar.Core.Abstractions;
 using PriceRadar.Infrastructure.Persistence;
+using PriceRadar.Infrastructure.Sources;
+using PriceRadar.Infrastructure.Staging;
 
 namespace PriceRadar.Infrastructure;
 
@@ -23,6 +26,15 @@ public static class DependencyInjection
 
         services.AddDbContext<PriceRadarDbContext>(options =>
             options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure(maxRetryCount: 5)));
+
+        services.AddSingleton(new StagingConnectionString(connectionString));
+        services.AddTransient<StagingBulkWriter>();
+
+        // Fixture-backed sources (spec §4.5). The live Kupindo source is registered separately and stays disabled.
+        var fixturesRoot = FixturePaths.Resolve(configuration["Sources:FixturesPath"]);
+        services.AddSingleton<IListingSource>(new FixtureListingSource("fixture", fixturesRoot));
+        services.AddSingleton<IListingSource>(new FixtureListingSource("kp", fixturesRoot));
+        services.AddSingleton<ListingSourceRegistry>();
 
         return services;
     }

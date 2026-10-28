@@ -1,0 +1,369 @@
+{
+  "source": "kp",
+  "scopeKey": "kp:category:knjige",
+  "capturedAtUtc": "2026-10-25T10:00:00Z",
+  "pages": 2,
+  "note": "Invented listings for tests and demos. Not scraped from any marketplace.",
+  "listings": [
+    {
+      "externalId": "158400000",
+      "title": "На Дрини ћуприја",
+      "author": "Иво Андрић",
+      "price": "Dogovor",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158400000",
+      "postedAtUtc": "2026-10-01T00:00:00Z"
+    },
+    {
+      "externalId": "158401337",
+      "title": "Ivo Andrić - Gospođica",
+      "author": null,
+      "price": "Dogovor",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158401337",
+      "postedAtUtc": "2026-10-01T11:00:00Z"
+    },
+    {
+      "externalId": "158402674",
+      "title": "Seobe - meki povez",
+      "author": "Miloš Crnjanski",
+      "price": "800 din",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158402674",
+      "postedAtUtc": "2026-10-01T22:00:00Z"
+    },
+    {
+      "externalId": "158404011",
+      "title": "Dnevnik o Čanojeviću",
+      "author": "Miloš Crnjanski",
+      "price": "5,00 €",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158404011",
+      "postedAtUtc": "2026-10-02T09:00:00Z"
+    },
+    {
+      "externalId": "158405348",
+      "title": "Enciklopedija mrtvih (tvrd povez)",
+      "author": "Danilo Kiš",
+      "price": "4 €",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158405348",
+      "postedAtUtc": "2026-10-02T20:00:00Z"
+    },
+    {
+      "externalId": "158406685",
+      "title": "Predeo slikan čajem - meki povez",
+      "author": "Milorad Pavić",
+      "price": "600 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158406685",
+      "postedAtUtc": "2026-10-03T07:00:00Z"
+    },
+    {
+      "externalId": "158408022",
+      "title": "Branko Ćopić - Orlovi rano lete",
+      "author": null,
+      "price": "4 €",
+      "condition": "Kao novo (polovno)",
+      "url": "https://kp.priceradar.local/knjige/oglas/158408022",
+      "postedAtUtc": "2026-10-03T18:00:00Z"
+    },
+    {
+      "externalId": "158409359",
+      "title": "Kotana",
+      "author": "Borisav Stanković",
+      "price": "2 €",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158409359",
+      "postedAtUtc": "2026-10-04T05:00:00Z"
+    },
+    {
+      "externalId": "158410696",
+      "title": "Sumnjivo lie",
+      "author": "Branislav Nušić",
+      "price": "350 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158410696",
+      "postedAtUtc": "2026-10-04T16:00:00Z"
+    },
+    {
+      "externalId": "158412033",
+      "title": "Pesme",
+      "author": "D. Maksimović",
+      "price": "350 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158412033",
+      "postedAtUtc": "2026-10-05T03:00:00Z"
+    },
+    {
+      "externalId": "158413370",
+      "title": "Dorćol, 1977.",
+      "author": "Svetlana Velmar-Janković",
+      "price": "650 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158413370",
+      "postedAtUtc": "2026-10-05T14:00:00Z"
+    },
+    {
+      "externalId": "158414707",
+      "title": "Време чуда",
+      "author": "Борислав Пекић",
+      "price": "550 din",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158414707",
+      "postedAtUtc": "2026-10-06T01:00:00Z"
+    },
+    {
+      "externalId": "158416044",
+      "title": "ZLOČIN I KAZNA",
+      "author": "Fjodor Dostojevski",
+      "price": "500 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158416044",
+      "postedAtUtc": "2026-10-06T12:00:00Z"
+    },
+    {
+      "externalId": "158417381",
+      "title": "Majstor i Margarita",
+      "author": "Bulgakov Mihail",
+      "price": "850 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158417381",
+      "postedAtUtc": "2026-10-06T23:00:00Z"
+    },
+    {
+      "externalId": "158418718",
+      "title": "Hiljadu čudesnih sunaca NOVO",
+      "author": "Haled Hoseini",
+      "price": "600 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158418718",
+      "postedAtUtc": "2026-10-07T10:00:00Z"
+    },
+    {
+      "externalId": "158420055",
+      "title": "На Дрини ћуприја",
+      "author": "Иво Андрић",
+      "price": "900 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158420055",
+      "postedAtUtc": "2026-10-07T21:00:00Z"
+    },
+    {
+      "externalId": "158421392",
+      "title": "Gospodjica",
+      "author": "Ivo Andric",
+      "price": "600 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158421392",
+      "postedAtUtc": "2026-10-08T08:00:00Z"
+    },
+    {
+      "externalId": "158422729",
+      "title": "Seobe",
+      "author": "M. Crnjanski",
+      "price": "5 EUR",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158422729",
+      "postedAtUtc": "2026-10-08T19:00:00Z"
+    },
+    {
+      "externalId": "158424066",
+      "title": "Дневник о Чарнојевићу",
+      "author": "Милош Црњански",
+      "price": "350 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158424066",
+      "postedAtUtc": "2026-10-09T06:00:00Z"
+    },
+    {
+      "externalId": "158425403",
+      "title": "Enciklopedija mrtvih !!!",
+      "author": "Danilo Kiš",
+      "price": "900 din",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158425403",
+      "postedAtUtc": "2026-10-09T17:00:00Z"
+    },
+    {
+      "externalId": "158426740",
+      "title": "Predeo slikan cajem",
+      "author": "Milorad Pavic",
+      "price": "1.000 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158426740",
+      "postedAtUtc": "2026-10-10T04:00:00Z"
+    },
+    {
+      "externalId": "158428077",
+      "title": "Orlovi rano lete",
+      "author": null,
+      "price": "200 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158428077",
+      "postedAtUtc": "2026-10-10T15:00:00Z"
+    },
+    {
+      "externalId": "158429414",
+      "title": "Koštna",
+      "author": "Borisav Stanković",
+      "price": "3 €",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158429414",
+      "postedAtUtc": "2026-10-11T02:00:00Z"
+    },
+    {
+      "externalId": "158430751",
+      "title": "Sumnjivo lice",
+      "author": "Branislav Nusic",
+      "price": "400 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158430751",
+      "postedAtUtc": "2026-10-11T13:00:00Z"
+    },
+    {
+      "externalId": "158432088",
+      "title": "Песме",
+      "author": "Десанка Максимовић",
+      "price": "250 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158432088",
+      "postedAtUtc": "2026-10-12T00:00:00Z"
+    },
+    {
+      "externalId": "158433425",
+      "title": "Dorćol",
+      "author": "Svetlana Velmar-Janković",
+      "price": "800 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158433425",
+      "postedAtUtc": "2026-10-12T11:00:00Z"
+    },
+    {
+      "externalId": "158434762",
+      "title": "Vreme cuda",
+      "author": "Borislav Pekic",
+      "price": "700 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158434762",
+      "postedAtUtc": "2026-10-12T22:00:00Z"
+    },
+    {
+      "externalId": "158436099",
+      "title": "Fjodor Dostojevski - Zločin i kazna",
+      "author": null,
+      "price": "600 din",
+      "condition": "Kao novo (polovno)",
+      "url": "https://kp.priceradar.local/knjige/oglas/158436099",
+      "postedAtUtc": "2026-10-13T09:00:00Z"
+    },
+    {
+      "externalId": "158437436",
+      "title": "Mihail Bulgakov - Majstor i Margarita",
+      "author": null,
+      "price": "600 din",
+      "condition": "Kao novo (polovno)",
+      "url": "https://kp.priceradar.local/knjige/oglas/158437436",
+      "postedAtUtc": "2026-10-13T20:00:00Z"
+    },
+    {
+      "externalId": "158438773",
+      "title": "Hiljadu čudesnih sunaca",
+      "author": null,
+      "price": "600 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158438773",
+      "postedAtUtc": "2026-10-14T07:00:00Z"
+    },
+    {
+      "externalId": "158440110",
+      "title": "Na Drni ćuprija",
+      "author": "Ivo Andrić",
+      "price": "800 din",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158440110",
+      "postedAtUtc": "2026-10-14T18:00:00Z"
+    },
+    {
+      "externalId": "158441447",
+      "title": "Gospođica",
+      "author": "Andrić Ivo",
+      "price": "2,00 €",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158441447",
+      "postedAtUtc": "2026-10-15T05:00:00Z"
+    },
+    {
+      "externalId": "158442784",
+      "title": "Seobe",
+      "author": "Miloš Crnjanski",
+      "price": "6 EUR",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158442784",
+      "postedAtUtc": "2026-10-15T16:00:00Z"
+    },
+    {
+      "externalId": "158444121",
+      "title": "Dnevnik o Čarnojeviću",
+      "author": "M. Crnjanski",
+      "price": "6,00 €",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158444121",
+      "postedAtUtc": "2026-10-16T03:00:00Z"
+    },
+    {
+      "externalId": "158445458",
+      "title": "Enciklopedija mrtvih",
+      "author": "Kiš Danilo",
+      "price": "Dogovor",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158445458",
+      "postedAtUtc": "2026-10-16T14:00:00Z"
+    },
+    {
+      "externalId": "158446795",
+      "title": "Predeo slikan čajem",
+      "author": "Pavić Milorad",
+      "price": "9,00 €",
+      "condition": "Kao novo (polovno)",
+      "url": "https://kp.priceradar.local/knjige/oglas/158446795",
+      "postedAtUtc": "2026-10-17T01:00:00Z"
+    },
+    {
+      "externalId": "158448132",
+      "title": "Orlovi rano lete !!!",
+      "author": "Branko Ćopić",
+      "price": "300 din",
+      "condition": "Kao novo (polovno)",
+      "url": "https://kp.priceradar.local/knjige/oglas/158448132",
+      "postedAtUtc": "2026-10-17T12:00:00Z"
+    },
+    {
+      "externalId": "158449469",
+      "title": "KOŠTANA",
+      "author": "Borisav Stanković",
+      "price": "3,00 €",
+      "condition": "Korišćeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158449469",
+      "postedAtUtc": "2026-10-17T23:00:00Z"
+    },
+    {
+      "externalId": "158450806",
+      "title": "Sumnjivo lice",
+      "author": "Branislav Nušić",
+      "price": "250 din",
+      "condition": "Novo - neotpakovano",
+      "url": "https://kp.priceradar.local/knjige/oglas/158450806",
+      "postedAtUtc": "2026-10-18T10:00:00Z"
+    },
+    {
+      "externalId": "158452143",
+      "title": "Pesme",
+      "author": null,
+      "price": "550 din",
+      "condition": "Oštećeno",
+      "url": "https://kp.priceradar.local/knjige/oglas/158452143",
+      "postedAtUtc": "2026-10-18T21:00:00Z"
+    }
+  ]
+}

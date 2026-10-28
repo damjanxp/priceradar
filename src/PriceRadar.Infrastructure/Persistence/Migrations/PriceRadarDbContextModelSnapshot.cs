@@ -515,13 +515,12 @@ namespace PriceRadar.Infrastructure.Persistence.Migrations
                         new
                         {
                             SourceId = (byte)4,
-                            BaseUrl = "https://www.kupujemprodajem.com",
                             Code = "kp",
                             CreatedAtUtc = new DateTime(2026, 10, 28, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsEnabled = false,
-                            Kind = (byte)2,
-                            MinDelayMs = 4000,
-                            Name = "KupujemProdajem"
+                            IsEnabled = true,
+                            Kind = (byte)0,
+                            MinDelayMs = 0,
+                            Name = "KupujemProdajem-style fixtures"
                         });
                 });
 
