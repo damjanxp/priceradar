@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+*.user
+.vs/
+.idea/
+*.swp
+
+# Secrets and local environment
+.env
+appsettings.*.local.json
+
+# Spec build output (see docs/spec/.gitignore)
+docs/spec/build/
+node_modules/

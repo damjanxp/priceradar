@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Domain + application logic. No I/O dependencies allowed (spec §4.4). -->
+  <PropertyGroup>
+    <RootNamespace>PriceRadar.Core</RootNamespace>
+  </PropertyGroup>
+
+</Project>

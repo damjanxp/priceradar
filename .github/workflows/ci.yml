@@ -1,0 +1,32 @@
+# Minimal DAY-1 pipeline: restore, build and unit tests. The full lint/test/docker pipeline is DAY-8 (spec §12.2).
+name: ci
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Unit tests
+        run: dotnet test tests/PriceRadar.UnitTests -c Release --no-build --logger "console;verbosity=normal"

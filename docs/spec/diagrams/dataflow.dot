@@ -1,0 +1,44 @@
+digraph dataflow {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=11, nodesep=0.3, ranksep=0.4, pad=0.2, bgcolor="white"];
+  node  [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#5b6b7f", fontname="Helvetica", fontsize=9.5, margin="0.1,0.05"];
+  edge  [color="#5b6b7f", fontname="Helvetica", fontsize=8, arrowsize=0.7];
+
+  subgraph cluster_src { label="1. Acquire"; style="rounded,dashed"; color="#9aa7b5";
+    src [label="IListingSource\nFetchAsync()"];
+  }
+  subgraph cluster_stg { label="2. Staging  (schema ingest)"; style="rounded,filled"; fillcolor="#f4f8fc"; color="#3a6ea5";
+    run [label="ingest.ScrapeRun\nStatus=Running"];
+    stg [label="ingest.StagingListing\nraw text, ProcessStatus=New"];
+  }
+  subgraph cluster_norm { label="3. Normalize + match  (C#, Core)"; style="rounded,filled"; fillcolor="#fffaf0"; color="#b7862b";
+    norm [label="Parse price · Normalize\ntitle/author · reject junk"];
+    match [label="Candidate index\n+ similarity score"];
+    ai [label="Ambiguous →\nmatch.MatchCache /\nClaude API"];
+    apply [label="ingest.usp_ApplyMatchResults\n(TVP)"];
+  }
+  subgraph cluster_dw { label="4. Warehouse  (schema dw)"; style="rounded,filled"; fillcolor="#f6fbf4"; color="#4a8a3a";
+    book [label="dw.Book\n(dimension)"];
+    listing [label="dw.Listing\n(upsert by Source+ExternalId)"];
+    fact [label="dw.PriceSnapshot\n(fact, 1 row / listing / run)", fillcolor="#e8f5e2"];
+    pres [label="dw.usp_UpdateListingPresence\nMissedRunCount → Disappeared"];
+  }
+  subgraph cluster_serve { label="5. Serve"; style="rounded,dashed"; color="#9aa7b5";
+    stats [label="dw.usp_GetBookStats\ndw.usp_GetPriceHistory"];
+    api [label="REST API\n/lookup · /stats"];
+  }
+
+  src -> stg [label="SqlBulkCopy\nbatch 1,000"];
+  run -> stg [style=dotted, arrowhead=none];
+  stg -> norm -> match;
+  match -> apply [label="score ≥ 0.90\nor < 0.65"];
+  match -> ai [label="0.65–0.90\nor small margin"];
+  ai -> apply;
+  apply -> stg [label="NormTitle, BookId,\nMatchStatus", style=dashed, constraint=false];
+  apply -> book [label="new books"];
+  stg -> listing [label="dw.usp_LoadRun\n(MERGE)"];
+  listing -> fact [label="INSERT … WHERE\nNOT EXISTS"];
+  book -> listing [style=dotted, arrowhead=none];
+  listing -> pres [style=dashed];
+  fact -> stats -> api;
+  pres -> stats [style=dashed];
+}

@@ -1,0 +1,60 @@
+digraph architecture {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=11, nodesep=0.3, ranksep=0.45, pad=0.2, bgcolor="white", newrank=true, compound=true];
+  node  [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#5b6b7f", fontname="Helvetica", fontsize=10, margin="0.12,0.06"];
+  edge  [color="#5b6b7f", fontname="Helvetica", fontsize=8.5, arrowsize=0.7];
+
+  subgraph cluster_clients {
+    label="Clients"; style="rounded,dashed"; color="#9aa7b5"; fontcolor="#334";
+    phone   [label="Phone browser\n(wwwroot/index.html)", fillcolor="#eef5ff"];
+    devtool [label="Scalar UI / .http files / curl", fillcolor="#eef5ff"];
+  }
+
+  subgraph cluster_compose {
+    label="docker compose (local)"; style="rounded"; color="#3a6ea5"; fontcolor="#3a6ea5";
+
+    subgraph cluster_api {
+      label="PriceRadar.Api  (ASP.NET Core 9, :5080)"; style="rounded,filled"; fillcolor="#f4f8fc"; color="#3a6ea5";
+      mw     [label="Middleware\nProblemDetails · RateLimiter · ApiKey\nSerilog request logging"];
+      ctrl   [label="Controllers\nBooks · Lookup · Ingestion"];
+      qsvc   [label="Query services\n(Dapper → stored procs)"];
+      dash   [label="Hangfire Dashboard\n/hangfire"];
+    }
+
+    subgraph cluster_core {
+      label="PriceRadar.Core  (shared library, no I/O)"; style="rounded,filled"; fillcolor="#fffaf0"; color="#b7862b";
+      core   [label="Normalizer · CandidateIndex · Matcher\nVerdictPolicy · PresencePolicy"];
+    }
+
+    subgraph cluster_worker {
+      label="PriceRadar.Worker  (Worker Service)"; style="rounded,filled"; fillcolor="#f6fbf4"; color="#4a8a3a";
+      hfs    [label="Hangfire server\nqueues: ingest · match · load"];
+      jobs   [label="Jobs\nScrape → Match → Resolve → Load"];
+      src    [label="IListingSource\nFixture · Synthetic · Kupindo*"];
+    }
+
+    sql [shape=cylinder, label="SQL Server 2022  (:14333)\nschemas: ingest · dw · match · hangfire", fillcolor="#fff4f4", color="#a54a4a", height=0.9];
+  }
+
+  claude [label="Claude API\n(claude-haiku-5-5)", style="rounded,filled,dashed", fillcolor="#f3efff", color="#6a4fb3"];
+  sites  [label="Marketplaces\n*live scraping off by default,\npersonal local use only", style="rounded,filled,dashed", fillcolor="#f5f5f5", color="#888"];
+
+  phone   -> mw   [label=" GET /api/lookup"];
+  devtool -> mw;
+  mw -> ctrl;
+  ctrl -> qsvc;
+  ctrl -> dash [style=invis];
+  ctrl -> core [style=dashed, label=" normalize/match\n (lookup)"];
+  qsvc -> sql  [label=" Dapper"];
+  ctrl -> sql  [label=" EF Core\n (enqueue run)", style=dashed];
+  dash -> sql  [style=dotted, arrowhead=none];
+  hfs -> sql   [label=" poll queue", style=dotted, dir=back];
+  hfs -> jobs;
+  jobs -> core [style=dashed];
+  jobs -> sql  [label=" SqlBulkCopy\n + procs"];
+  jobs -> src;
+  jobs -> claude [label=" ambiguous only\n (HTTPS, cached)"];
+  src  -> sites [label=" robots.txt · rate limit", style=dashed];
+
+  { rank=same; core; }
+  { rank=same; claude; sites; }
+}

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PriceRadar.Seeder</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PriceRadar.Core\PriceRadar.Core.csproj" />
+    <ProjectReference Include="..\..\src\PriceRadar.Infrastructure\PriceRadar.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

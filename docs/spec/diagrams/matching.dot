@@ -1,0 +1,29 @@
+digraph matching {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=10, nodesep=0.3, ranksep=0.3, pad=0.15, bgcolor="white"];
+  node  [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#5b6b7f", fontname="Helvetica", fontsize=9, margin="0.08,0.04"];
+  edge  [color="#5b6b7f", fontname="Helvetica", fontsize=8, arrowsize=0.6];
+
+  raw   [label="Raw title + author"];
+  norm  [label="Normalize\n(N1–N8)"];
+  cand  [label="Candidates\n(top 20, inverted index)"];
+  score [label="Score\n0.7·Title + 0.3·Author"];
+  dec   [shape=diamond, label="best score\n& margin", fillcolor="#fffaf0", margin="0.02,0.02"];
+  auto  [label="AutoMatched", fillcolor="#e8f5e2"];
+  newb  [label="NewBook", fillcolor="#eef5ff"];
+  cache [shape=diamond, label="MatchCache\nhit?", fillcolor="#f3efff", margin="0.02,0.02"];
+  budget[shape=diamond, label="budget\nleft?", fillcolor="#f3efff", margin="0.02,0.02"];
+  claude[label="Claude API\n(JSON schema)", fillcolor="#f3efff"];
+  store [label="Store in\nMatchCache"];
+  pend  [label="Pending\n(retry next run)", fillcolor="#fff4f4"];
+  res   [label="AiMatched /\nNewBook(NeedsReview)", fillcolor="#e8f5e2"];
+
+  raw -> norm -> cand -> score -> dec;
+  dec -> auto  [label="≥ 0.90 and\nmargin ≥ 0.05"];
+  dec -> newb  [label="< 0.65 or\nno candidates"];
+  dec -> cache [label="otherwise"];
+  cache -> res [label="yes"];
+  cache -> budget [label="no"];
+  budget -> claude [label="yes"];
+  budget -> pend [label="no"];
+  claude -> store -> res;
+}
