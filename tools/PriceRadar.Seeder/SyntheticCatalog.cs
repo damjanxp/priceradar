@@ -89,9 +89,9 @@ internal static class SyntheticCatalog
 
         void Add(string title, string author)
         {
-            // DAY-2 folding (N1–N5). From DAY-3 the full TextNormalizer is used and the dataset is re-seeded.
-            var normTitle = SerbianText.FoldToAscii(title);
-            var normAuthor = SerbianText.FoldToAscii(author);
+            // The same normaliser as MatchJob and the lookup endpoint, so seeded books match real listings exactly.
+            var normTitle = TextNormalizer.NormalizeTitle(title);
+            var normAuthor = TextNormalizer.NormalizeAuthor(author);
             if (keys.Add($"{normAuthor}|{normTitle}"))
             {
                 var median = Math.Round((decimal)Math.Exp(Math.Log(300) + (rng.NextDouble() * (Math.Log(2500) - Math.Log(300)))) / 10m) * 10m;

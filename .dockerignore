@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/TestResults/
+.git/
+.vs/
+.idea/
+.env
+docs/
+tests/
+tools/
+**/*.user
+**/node_modules/

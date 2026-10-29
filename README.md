@@ -4,19 +4,25 @@ Market price intelligence for used books on Serbian marketplaces. Ask, at a flea
 
 > Work in progress: built in 10 days from the specification in [`docs/spec/PriceRadar-Spec.md`](docs/spec/PriceRadar-Spec.md) ([PDF](docs/spec/PriceRadar-Spec.pdf)). The full README follows the outline in the spec's Appendix A on DAY-9.
 
-## Quick start (DAY-1 state)
+## Quick start (DAY-3 state)
 
 Prerequisites: Docker Desktop, .NET SDK 9.0.3xx (pinned in `global.json`).
 
 ```powershell
 Copy-Item .env.example .env            # then set a strong MSSQL_SA_PASSWORD
-docker compose up -d sql               # SQL Server 2022 on localhost,14333
-dotnet tool restore                    # dotnet-ef 9.x (local tool manifest)
-dotnet user-secrets set "ConnectionStrings:Sql" "Server=localhost,14333;Database=PriceRadar;User Id=sa;Password=<your password>;TrustServerCertificate=True" --project src/PriceRadar.Api
-dotnet ef database update -p src/PriceRadar.Infrastructure -s src/PriceRadar.Api
-dotnet run --project src/PriceRadar.Api
+docker compose up -d --build           # SQL Server (localhost,14333), Api (localhost:5080), Worker (Hangfire)
 curl.exe -s http://localhost:5080/health/ready
+
+# Synthetic warehouse: 20k books, 60k listings, 500k price snapshots (~15–30 s)
+dotnet user-secrets set "ConnectionStrings:Sql" "Server=localhost,14333;Database=PriceRadar;User Id=sa;Password=<your password>;TrustServerCertificate=True" --project src/PriceRadar.Api
+dotnet run --project tools/PriceRadar.Seeder -c Release -- seed --seed 42 --reset
+
+# Trigger an ingestion run and watch it at http://localhost:5080/hangfire
+curl.exe -s -X POST http://localhost:5080/api/ingestion/runs -H "Content-Type: application/json" -d '{\"source\":\"fixture\",\"fixtureSet\":\"run-001\"}'
+curl.exe -s http://localhost:5080/api/ingestion/runs
 ```
+
+Running the Api outside Docker: `dotnet tool restore`, then `dotnet run --project src/PriceRadar.Api` (it uses the same user-secrets connection string and applies migrations on startup).
 
 ## Solution layout
 

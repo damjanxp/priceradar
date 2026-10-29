@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.4 |
+| Version | 1.5 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.5 | 2026-10-29 | D. Petrov / Claude | DAY-3 results: presence numbers corrected to 121/6 (rejected rows never reach the warehouse), new books created in `usp_ApplyMatchResults`, `ScrapeRun.FixtureSet`, full-wipe `--reset`, two startup failure modes |
 | 1.4 | 2026-10-28 | D. Petrov / Claude | DAY-2 results folded in: Zipf–Mandelbrot skew (q = 10), measured seed output, `sqlcmd -I` failure symptom |
 | 1.3 | 2026-10-28 | D. Petrov / Claude | KupujemProdajem becomes a synthetic fixture source (its ToS §11 forbids scraping); live Kupindo limited to category pages (robots.txt blocks search); D-37 revised, D-39 added |
 
@@ -254,6 +255,7 @@ Keys: **PK** primary key, **FK** foreign key, **UQ** unique. All `...AtUtc` colu
 | SourceId | tinyint | no | FK → Source |
 | ScopeKey | varchar(200) | no | Canonical scope, e.g. `kupindo:category:domaci-pisci` or `fixture:category:knjige`; used by the sold heuristic |
 | Query | nvarchar(200) | yes | Free-text query, if any |
+| FixtureSet | varchar(32) | yes | Fixture sources only: the recorded file the run replays (`run-001`) |
 | Status | tinyint | no | [0 Queued, 1 Running, 2 Succeeded, 3 Failed, 4 Cancelled] |
 | Stage | tinyint | no | [0 Created, 1 Scraped, 2 Matched, 3 Resolved, 4 Loaded] — the last completed step |
 | IsComplete | bit | no | 1 when every page in scope was fetched (no page cap hit, no page error) |
@@ -363,9 +365,9 @@ Indexes: `UX_PriceSnapshot_Listing_Run (ListingId, ScrapeRunId)` — guarantees 
 
 | Object | Purpose | Called by |
 |---|---|---|
-| `ingest.MatchResultType` (TVP) | `(StagingListingId bigint, PriceRsd decimal(12,2) NULL, NormTitle, NormAuthor, BookId int NULL, MatchStatus tinyint, MatchScore decimal(5,4) NULL, ProcessStatus tinyint, RejectReason varchar(50) NULL, NewBookTitle nvarchar(300) NULL, NewBookAuthor nvarchar(200) NULL)` | MatchJob, ResolveJob |
-| `ingest.usp_ApplyMatchResults @ScrapeRunId, @Results` | Set-based `UPDATE … FROM @Results` on staging | MatchJob, ResolveJob |
-| `dw.usp_LoadRun @ScrapeRunId` | In one transaction: insert missing `dw.Book` rows by `NormKey`; `MERGE dw.Listing` on `(SourceId, ExternalId)`; `INSERT dw.PriceSnapshot … WHERE NOT EXISTS`; set staging `ProcessStatus = Loaded`; update run counters | LoadJob |
+| `ingest.MatchResultType` (TVP) | `(StagingListingId bigint, PriceRsd decimal(12,2) NULL, NormTitle, NormAuthor, BookId int NULL, MatchStatus tinyint, MatchScore decimal(5,4) NULL, ProcessStatus tinyint, RejectReason varchar(50) NULL, NewBookTitle nvarchar(300) NULL, NewBookAuthor nvarchar(200) NULL, NewBookOrigin tinyint NULL, NewBookNeedsReview bit NULL)` | MatchJob, ResolveJob |
+| `ingest.usp_ApplyMatchResults @ScrapeRunId, @Results` | In one transaction: create the `dw.Book` rows for NewBook decisions (once per `NormKey`, `UPDLOCK, HOLDLOCK`), then a set-based `UPDATE … FROM @Results` on staging, so every row leaves with a BookId unless it is Pending or Rejected | MatchJob, ResolveJob |
+| `dw.usp_LoadRun @ScrapeRunId` | In one transaction: `MERGE dw.Listing` on `(SourceId, ExternalId)` (an older run never overwrites a newer one; a seen listing is reset to Active); `INSERT dw.PriceSnapshot … WHERE NOT EXISTS`; set staging `ProcessStatus = Loaded`; update run counters. Rejected rows never reach the warehouse | LoadJob |
 | `dw.usp_UpdateListingPresence @ScrapeRunId, @MissedRunsThreshold` | Sold heuristic (§7); no-op unless the run is `Succeeded` and `IsComplete = 1` | LoadJob |
 | `dw.usp_GetBookStats @BookId, @WindowDays = 30, @AsOfUtc = NULL` | Two result sets: price distribution and supply/disappeared counts | `GET …/stats`, lookup |
 | `dw.usp_GetPriceHistory @BookId, @FromDateKey, @ToDateKey, @Bucket ('day'\|'week')` | Min/median/max/count per bucket, joined to `dw.DimDate` | `GET …/price-history` |
@@ -546,9 +548,9 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 
 | File | Listings in file | Change vs previous run | State after load |
 |---|---|---|---|
-| `run-001.json` | L001–L120 (120) | — | 120 Active |
-| `run-002.json` | L001–L112, L121–L126 (118) | L113–L120 missing; 6 new | 126 Active; L113–L120 `MissedRunCount = 1` |
-| `run-003.json` | L001–L110, L113–L114, L121–L130 (122) | L111–L112 missing; L113–L114 back; 4 new | **124 Active, 6 Disappeared** (L115–L120); L111–L112 `MissedRunCount = 1` |
+| `run-001.json` | L001–L120 (120) | — | 117 Active (L037, L064, L088 have unusable prices and are rejected) |
+| `run-002.json` | L001–L112, L121–L126 (118) | L113–L120 missing; 6 new | 123 Active; L113–L120 `MissedRunCount = 1` |
+| `run-003.json` | L001–L110, L113–L114, L121–L130 (122) | L111–L112 missing; L113–L114 back; 4 new | **121 Active, 6 Disappeared** (L115–L120); L111–L112 `MissedRunCount = 1` |
 
 **Limitations (stated honestly in the README).**
 
@@ -752,7 +754,7 @@ Options are bound to classes with `ValidateDataAnnotations().ValidateOnStart()`,
 | Stats proc | Prices 100, 200, 300, 400 | P25 175, median 250, P75 325 |
 | Stats proc | Same listing in 3 runs at 500, 450, 400 | Counted once at 400 |
 | Load | Run `LoadJob` twice for one run | Identical row counts, 0 duplicate snapshots |
-| Presence | Fixture runs 001→002→003 | 6 Disappeared, 124 Active, 2 with `MissedRunCount = 1` |
+| Presence | Fixture runs 001→002→003 | 6 Disappeared, 121 Active, 2 with `MissedRunCount = 1` |
 | AI | Same normalised string in 2 runs | 1 HTTP call, `HitCount = 1` |
 | AI | Claude returns a `bookId` not among the candidates | Stored as `Error`, row → Pending |
 | API | `askingPrice=0` | 400 with `errors.askingPrice` |
@@ -765,6 +767,7 @@ Options are bound to classes with `ValidateDataAnnotations().ValidateOnStart()`,
 - Book titles come from a word-list grammar plus about 300 real classic titles/authors from Serbian literature (public metadata only). Prices are log-normal per book (median 300–2,500 RSD).
 - **Zipf–Mandelbrot popularity**, weight `1 / (rank + 10)^1.1` over a random rank order: the top books have thousands of snapshots (8,275 for the hottest with `--seed 42`) and the median book has 14. A plain Zipf (offset 0) was rejected after measuring it: one book got 15 % of all snapshots. The skew is realistic, and it creates the *parameter sniffing* case that DAY-6 investigates.
 - It creates 180 synthetic `ScrapeRun` rows (source `synthetic`) and writes Book → Listing → PriceSnapshot with `SqlBulkCopy` (`TableLock`, `BatchSize = 10,000`, streaming `IDataReader`), so memory stays flat.
+- `--reset` wipes **all** pipeline data (runs, staging, books, listings, snapshots, match cache; `ingest.Source` and `dw.DimDate` stay) and reseeds identities to 1. Partial resets are not offered: books created by fixture runs share `NormKey`s with seeded classics.
 - Output: elapsed time per table, logged and copied into `BENCHMARKS.md`. Hot/cold book IDs are printed for the benchmarks (`hot = most snapshots`, `cold = median snapshots`).
 
 ### 11.4 SQL benchmark method
@@ -808,7 +811,7 @@ Git Bash: `docker run --rm -i -e BASE_URL=http://host.docker.internal:5080 grafa
 | 2 | Stage fixture | `dotnet run --project tools/PriceRadar.Seeder -- stage-fixture --set run-001` | 120 staging rows, `ProcessStatus = 0` |
 | 3 | Pipeline run | `curl -X POST localhost:5080/api/ingestion/runs -H "X-Api-Key: dev-key" -H "Content-Type: application/json" -d '{"source":"fixture","fixtureSet":"run-001"}'` | 202 + 4 succeeded jobs in `/hangfire` |
 | 3 | Idempotency | Requeue `LoadJob` in the dashboard, then the duplicate query | 0 rows |
-| 3 | Sold heuristic | Runs 001 → 002 → 003 | 6 Disappeared / 124 Active |
+| 3 | Sold heuristic | Runs 001 → 002 → 003 | 6 Disappeared / 121 Active |
 | 4 | Proc correctness | `dotnet test tests/PriceRadar.IntegrationTests --filter "FullyQualifiedName~Stats"` | Passed |
 | 5 | API | `curl -s "localhost:5080/api/lookup?title=Na%20Drini%20cuprija&author=Ivo%20Andric&askingPrice=400"` | 200, `verdict` present |
 | 5 | Validation | `curl -i "localhost:5080/api/lookup?title=x&askingPrice=0"` | 400 ProblemDetails |
@@ -998,7 +1001,7 @@ SELECT TOP 10 RawTitle, RawAuthor, RawPrice FROM ingest.StagingListing;      -- 
 
 - [ ] The fixture run-001 POST returns 202, and 4 jobs succeed in the dashboard
 - [ ] Requeuing `LoadJob` creates 0 duplicate snapshots
-- [ ] After runs 001 → 002 → 003: 6 Disappeared, 124 Active, 2 listings with `MissedRunCount = 1`
+- [ ] After runs 001 → 002 → 003: 6 Disappeared, 121 Active, 2 listings with `MissedRunCount = 1`
 - [ ] A second POST while a run is active → 409
 - [ ] Normaliser tests (≥ 15 cases) green
 
@@ -1022,7 +1025,7 @@ GROUP BY ListingId, ScrapeRunId HAVING COUNT(*) > 1;                  -- must re
 -- after posting run-002 and run-003:
 SELECT Status, MissedRunCount, COUNT(*) FROM dw.Listing l
 JOIN ingest.Source s ON s.SourceId = l.SourceId AND s.Code = 'fixture'
-GROUP BY Status, MissedRunCount;   -- (0,0)=122, (0,1)=2, (1,2)=6  → 124 Active, 6 Disappeared
+GROUP BY Status, MissedRunCount;   -- measured: (0,0)=119, (0,1)=2, (1,2)=6  → 121 Active, 6 Disappeared
 ```
 
 Concurrency check: send two POSTs back to back (`1..2 | % { Invoke-WebRequest … -SkipHttpErrorCheck }`). Expect one 202 and one 409.
@@ -1036,6 +1039,9 @@ Concurrency check: send two POSTs back to back (`1..2 | % { Invoke-WebRequest �
 - DI errors inside jobs → a scoped `DbContext` resolved from a singleton; let Hangfire activate jobs per scope.
 - Presence counts off → the run is not marked `IsComplete`, or the scope key differs between fixture runs.
 - 500 instead of 409 → SqlException 2601/2627 is not translated in the ingestion service.
+- Api exits with *error 1801 "Database 'PriceRadar' already exists"* right after the SQL container restarted → the server accepts logins (healthcheck green) while the database is still recovering; EF cannot open it, assumes it is missing and runs `CREATE DATABASE`. Fixed by waiting until `sys.databases.state_desc` is ONLINE (or the database is absent) before migrating.
+- Run IDs jump by 10,000 (e.g. 10181) → SQL Server's identity cache after an unclean shutdown; `DELETE` and `DBCC CHECKIDENT … RESEED` never lower it. Harmless; `seed --reset` reseeds to 1.
+- A run stays Running for minutes → a non-transient error is being retried (30/120/300 s). Unknown fixture sets are therefore rejected with 400 at request time.
 
 **Cut-if-late:** `Idempotency-Key` header support (keep the filtered unique index). Never cut the duplicate check and the presence test.
 

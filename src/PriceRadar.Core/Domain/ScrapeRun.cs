@@ -11,6 +11,9 @@ public class ScrapeRun
     public required string ScopeKey { get; set; }
     public string? Query { get; set; }
 
+    /// <summary>Fixture sources only: which recorded file the run replays, e.g. <c>run-001</c>.</summary>
+    public string? FixtureSet { get; set; }
+
     public RunStatus Status { get; set; }
     public RunStage Stage { get; set; }
 

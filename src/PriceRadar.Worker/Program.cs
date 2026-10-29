@@ -1,8 +1,9 @@
+using Hangfire;
 using PriceRadar.Infrastructure;
+using PriceRadar.Infrastructure.Jobs;
 using Serilog;
 
-// The Hangfire server is added on DAY-3 (spec §9.1). Until then the Worker only proves it can start
-// with the shared configuration and infrastructure registrations.
+// Hosts the Hangfire server that runs the ingestion pipeline (spec §9.1). The Api enqueues; this process executes.
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();
@@ -18,6 +19,12 @@ try
         .Enrich.WithProperty("Application", "PriceRadar.Worker"));
 
     builder.Services.AddPriceRadarInfrastructure(builder.Configuration);
+    builder.Services.AddHangfireServer(options =>
+    {
+        options.ServerName = $"priceradar-worker:{Environment.MachineName}";
+        options.Queues = HangfireQueues.All;
+        options.WorkerCount = 2;
+    });
 
     var host = builder.Build();
     await host.RunAsync();

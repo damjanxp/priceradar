@@ -1,10 +1,15 @@
-# Local stack (spec §12.1). DAY-1 runs only `sql`; api and worker services are added on DAY-3.
+# Local stack (spec §12.1): SQL Server, the Api (port 5080) and the Worker (Hangfire server).
 name: priceradar
+
+x-dotnet-env: &dotnet-env
+  ConnectionStrings__Sql: "Server=sql,1433;Database=PriceRadar;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+  Sources__FixturesPath: /fixtures
 
 services:
   sql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: priceradar-sql
+    restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env (copy .env.example)}
@@ -20,6 +25,41 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/PriceRadar.Api/Dockerfile
+    image: priceradar-api:local
+    container_name: priceradar-api
+    restart: unless-stopped
+    environment:
+      <<: *dotnet-env
+      ASPNETCORE_ENVIRONMENT: Development   # local stack: Scalar UI and an open Hangfire dashboard
+      Database__ApplyMigrationsOnStartup: "true"
+    ports:
+      - "5080:8080"
+    volumes:
+      - ./tests/fixtures/sources:/fixtures:ro
+    depends_on:
+      sql:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: src/PriceRadar.Worker/Dockerfile
+    image: priceradar-worker:local
+    container_name: priceradar-worker
+    restart: unless-stopped
+    environment:
+      <<: *dotnet-env
+      DOTNET_ENVIRONMENT: Development
+    volumes:
+      - ./tests/fixtures/sources:/fixtures:ro
+    depends_on:
+      api:
+        condition: service_healthy   # the Api applies migrations; the Worker needs the schema
 
 volumes:
   sqldata:

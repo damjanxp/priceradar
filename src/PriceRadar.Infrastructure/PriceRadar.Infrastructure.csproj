@@ -9,13 +9,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.Core" />
+    <PackageReference Include="Hangfire.NetCore" />
+    <PackageReference Include="Hangfire.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Sql\**\*.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PriceRadar.UnitTests" />
+    <InternalsVisibleTo Include="PriceRadar.IntegrationTests" />
   </ItemGroup>
 
 </Project>

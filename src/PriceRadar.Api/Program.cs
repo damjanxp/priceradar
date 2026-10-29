@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using Hangfire;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using PriceRadar.Api.Health;
 using PriceRadar.Infrastructure;
@@ -21,12 +23,14 @@ try
         .Enrich.WithProperty("Application", "PriceRadar.Api"));
 
     builder.Services.AddPriceRadarInfrastructure(builder.Configuration);
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddOpenApi();
     builder.Services.AddProblemDetails();
 
     builder.Services.AddHealthChecks()
-        .AddDbContextCheck<PriceRadarDbContext>("sql", tags: [HealthTags.Ready]);
+        .AddDbContextCheck<PriceRadarDbContext>("sql", tags: [HealthTags.Ready])
+        .AddCheck<HangfireStorageHealthCheck>("hangfire", tags: [HealthTags.Ready]);
 
     var app = builder.Build();
 
@@ -55,6 +59,14 @@ try
     {
         Predicate = check => check.Tags.Contains(HealthTags.Ready),
         ResponseWriter = HealthResponseWriter.WriteAsync,
+    });
+
+    // The Api only enqueues jobs and shows the dashboard; the Worker runs them (spec §9.1).
+    app.MapHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        DashboardTitle = "PriceRadar jobs",
+        Authorization = [new DashboardAuthorization(app.Environment)],
+        IsReadOnlyFunc = _ => !app.Environment.IsDevelopment(),
     });
 
     app.MapControllers();

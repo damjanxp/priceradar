@@ -47,10 +47,11 @@ internal sealed class SeedCommand(StagingConnectionString connectionString)
         await using var connection = new SqlConnection(connectionString.Value);
         await connection.OpenAsync(ct);
 
-        var existing = await ScalarAsync<int>(connection, "SELECT COUNT(*) FROM ingest.ScrapeRun WHERE SourceId = 2", ct);
+        var existing = await ScalarAsync<int>(connection, "SELECT COUNT(*) FROM ingest.ScrapeRun", ct);
         if (existing > 0 && !o.Reset)
         {
-            throw new InvalidOperationException("Synthetic data already exists. Re-run with --reset to replace it.");
+            throw new InvalidOperationException(
+                "The database already holds runs. Re-run with --reset to wipe all pipeline data (runs, staging, books, listings, snapshots, match cache) and seed again.");
         }
 
         var total = Stopwatch.StartNew();
@@ -58,7 +59,7 @@ internal sealed class SeedCommand(StagingConnectionString connectionString)
         {
             var sw = Stopwatch.StartNew();
             await ResetAsync(connection, ct);
-            Console.WriteLine($"Reset: removed previous synthetic data ({sw.Elapsed.TotalSeconds:0.0} s)");
+            Console.WriteLine($"Reset: removed all pipeline data ({sw.Elapsed.TotalSeconds:0.0} s)");
         }
 
         var data = Generate(o, await ScalarAsync<int>(connection, "SELECT ISNULL(MAX(BookId), 0) FROM dw.Book", ct),
@@ -139,18 +140,26 @@ internal sealed class SeedCommand(StagingConnectionString connectionString)
         }
     }
 
+    /// <summary>
+    /// Wipes all pipeline data (reference data in ingest.Source and dw.DimDate stays). Partial resets are not offered:
+    /// books created by fixture runs share NormKeys with seeded classics, so mixing them would break UX_Book_NormKey.
+    /// </summary>
     private static async Task ResetAsync(SqlConnection connection, CancellationToken ct) =>
         await ExecuteAsync(connection, """
-            DELETE FROM dw.PriceSnapshot WHERE SourceId = 2;
-            DELETE FROM dw.Listing WHERE SourceId = 2;
-            DELETE b FROM dw.Book AS b
-            WHERE b.Origin = 0
-              AND NOT EXISTS (SELECT 1 FROM dw.Listing AS l WHERE l.BookId = b.BookId)
-              AND NOT EXISTS (SELECT 1 FROM dw.PriceSnapshot AS p WHERE p.BookId = b.BookId)
-              AND NOT EXISTS (SELECT 1 FROM match.MatchCache AS m WHERE m.ResolvedBookId = b.BookId);
-            DELETE s FROM ingest.StagingListing AS s
-            JOIN ingest.ScrapeRun AS r ON r.ScrapeRunId = s.ScrapeRunId WHERE r.SourceId = 2;
-            DELETE FROM ingest.ScrapeRun WHERE SourceId = 2;
+            DELETE FROM dw.PriceSnapshot;
+            DELETE FROM dw.Listing;
+            DELETE FROM match.MatchCache;
+            DELETE FROM dw.Book;
+            DELETE FROM ingest.StagingListing;
+            DELETE FROM ingest.ScrapeRun;
+            -- DELETE keeps identity values (and an unclean shutdown makes SQL Server skip ahead by its identity cache,
+            -- 1,000 for int / 10,000 for bigint); start every table at 1 again so seeded IDs are reproducible.
+            DBCC CHECKIDENT ('dw.PriceSnapshot', RESEED, 0) WITH NO_INFOMSGS;
+            DBCC CHECKIDENT ('dw.Listing', RESEED, 0) WITH NO_INFOMSGS;
+            DBCC CHECKIDENT ('match.MatchCache', RESEED, 0) WITH NO_INFOMSGS;
+            DBCC CHECKIDENT ('dw.Book', RESEED, 0) WITH NO_INFOMSGS;
+            DBCC CHECKIDENT ('ingest.StagingListing', RESEED, 0) WITH NO_INFOMSGS;
+            DBCC CHECKIDENT ('ingest.ScrapeRun', RESEED, 0) WITH NO_INFOMSGS;
             """, ct);
 
     private static async Task<long> TimedAsync(string label, Func<Task<long>> work)

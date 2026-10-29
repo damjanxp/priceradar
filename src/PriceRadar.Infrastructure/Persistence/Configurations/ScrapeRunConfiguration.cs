@@ -13,6 +13,7 @@ internal sealed class ScrapeRunConfiguration : IEntityTypeConfiguration<ScrapeRu
 
         builder.Property(x => x.ScopeKey).HasMaxLength(200).IsUnicode(false);
         builder.Property(x => x.Query).HasMaxLength(200);
+        builder.Property(x => x.FixtureSet).HasMaxLength(32).IsUnicode(false);
         builder.Property(x => x.EurRsdRate).HasPrecision(9, 4);
         builder.Property(x => x.RequestedBy).HasMaxLength(64);
         builder.Property(x => x.ErrorMessage).HasMaxLength(2000);

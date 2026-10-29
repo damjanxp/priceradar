@@ -367,6 +367,11 @@ namespace PriceRadar.Infrastructure.Persistence.Migrations
                         .HasPrecision(3)
                         .HasColumnType("datetime2(3)");
 
+                    b.Property<string>("FixtureSet")
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(32)");
+
                     b.Property<string>("HangfireJobId")
                         .HasMaxLength(64)
                         .IsUnicode(false)

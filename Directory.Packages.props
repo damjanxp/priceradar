@@ -6,10 +6,18 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.22" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.22" />
   </ItemGroup>
+  <ItemGroup Label="Background jobs">
+    <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.24" />
+    <PackageVersion Include="Hangfire.Core" Version="1.8.24" />
+    <PackageVersion Include="Hangfire.NetCore" Version="1.8.24" />
+    <PackageVersion Include="Hangfire.SqlServer" Version="1.8.24" />
+  </ItemGroup>
   <ItemGroup Label="Hosting and observability">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.22" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.22" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.22" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.22" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.22" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.18.3" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
