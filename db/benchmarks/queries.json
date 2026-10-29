@@ -1,0 +1,25 @@
+{
+  "description": "Benchmark queries (spec §11.4). IDs come from `seed --seed 42 --end-date 2026-10-28`; @AsOfUtc is fixed so results do not drift with the calendar.",
+  "queries": [
+    {
+      "id": "Q1",
+      "name": "Stats, hot book (8,275 snapshots)",
+      "sql": "EXEC dw.usp_GetBookStats @BookId = 6442, @WindowDays = 30, @AsOfUtc = '2026-10-28T12:00:00';"
+    },
+    {
+      "id": "Q2",
+      "name": "Stats, median book (14 snapshots)",
+      "sql": "EXEC dw.usp_GetBookStats @BookId = 13212, @WindowDays = 30, @AsOfUtc = '2026-10-28T12:00:00';"
+    },
+    {
+      "id": "Q3",
+      "name": "Price history, hot book, 180 days by week",
+      "sql": "EXEC dw.usp_GetPriceHistory @BookId = 6442, @FromDateKey = 20260501, @ToDateKey = 20261028, @Bucket = 'week';"
+    },
+    {
+      "id": "Q4",
+      "name": "Lookup exact-key search",
+      "sql": "SELECT BookId FROM dw.Book WHERE NormKey = 'andric ivo|na drini cuprija';"
+    }
+  ]
+}

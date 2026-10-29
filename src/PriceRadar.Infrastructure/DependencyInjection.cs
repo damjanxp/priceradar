@@ -8,6 +8,7 @@ using PriceRadar.Infrastructure.Ingestion;
 using PriceRadar.Infrastructure.Jobs;
 using PriceRadar.Infrastructure.Options;
 using PriceRadar.Infrastructure.Persistence;
+using PriceRadar.Infrastructure.Queries;
 using PriceRadar.Infrastructure.Sources;
 using PriceRadar.Infrastructure.Staging;
 
@@ -38,6 +39,8 @@ public static class DependencyInjection
         services.AddSingleton(new StagingConnectionString(connectionString));
         services.AddTransient<StagingBulkWriter>();
         services.AddScoped<IngestionService>();
+        services.AddTransient<BookStatsQuery>();
+        services.AddTransient<BookSearchQuery>();
         services.AddPriceRadarHangfire(connectionString);
 
         // Fixture-backed sources (spec §4.5). The live Kupindo source is registered separately and stays disabled.

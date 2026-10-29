@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.5 |
+| Version | 1.6 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.6 | 2026-10-29 | D. Petrov / Claude | DAY-4 results: measured baseline (4,736 reads, window-spool finding), benchmark runner script, AutomaticRetry note |
 | 1.5 | 2026-10-29 | D. Petrov / Claude | DAY-3 results: presence numbers corrected to 121/6 (rejected rows never reach the warehouse), new books created in `usp_ApplyMatchResults`, `ScrapeRun.FixtureSet`, full-wipe `--reset`, two startup failure modes |
 | 1.4 | 2026-10-28 | D. Petrov / Claude | DAY-2 results folded in: Zipf–Mandelbrot skew (q = 10), measured seed output, `sqlcmd -I` failure symptom |
 | 1.3 | 2026-10-28 | D. Petrov / Claude | KupujemProdajem becomes a synthetic fixture source (its ToS §11 forbids scraping); live Kupindo limited to category pages (robots.txt blocks search); D-37 revised, D-39 added |
@@ -1057,7 +1058,7 @@ Concurrency check: send two POSTs back to back (`1..2 | % { Invoke-WebRequest �
 - [ ] Dapper query services: `BookStatsQuery` (`QueryMultipleAsync` for 2 result sets), `PriceHistoryQuery`, `BookSearchQuery` (1.5 h)
 - [ ] `IntegrationTests`: `MsSqlFixture` (Testcontainers, migrations applied once) + Respawn (1.5 h)
 - [ ] Proc tests with hand-computed values (§11.2), window boundary test, empty-book test (1.5 h)
-- [ ] Baseline measurements on the 500k dataset for Q1–Q3 (no new index yet) → `BENCHMARKS.md` rows 1 and 4 (1 h)
+- [ ] Baseline measurements on the 500k dataset for Q1–Q4 (no new index yet) with `db/benchmarks/run_benchmarks.py baseline` → `BENCHMARKS.md` (1 h)
 
 **Deliverables:** `Sql/dw.usp_GetBookStats.sql`, `Sql/dw.usp_GetPriceHistory.sql`, `Queries/*.cs`, `IntegrationTests/Stats/*Tests.cs`, baseline rows and `.sqlplan` files.
 
@@ -1083,7 +1084,7 @@ SET STATISTICS IO, TIME ON;
 EXEC dw.usp_GetBookStats @BookId = @hot, @WindowDays = 30;
 EXEC dw.usp_GetPriceHistory @BookId = @hot, @FromDateKey = 20260501, @ToDateKey = 20261028, @Bucket = 'week';
 SET STATISTICS IO, TIME OFF;
--- Messages tab: "Table 'PriceSnapshot'. Scan count 1, logical reads ~3,000+" (baseline = full scan)
+-- measured baseline: "Table 'PriceSnapshot'. Scan count 13, logical reads 4736" (parallel full scan)
 -- Sanity: compare against a brute-force query
 SELECT COUNT(DISTINCT ListingId) FROM dw.PriceSnapshot
 WHERE BookId = @hot AND DateKey >= CONVERT(int, CONVERT(char(8), DATEADD(day,-30,SYSUTCDATETIME()),112));
@@ -1097,6 +1098,8 @@ WHERE BookId = @hot AND DateKey >= CONVERT(int, CONVERT(char(8), DATEADD(day,-30
 - Percentiles differ slightly from Excel → Excel's `PERCENTILE.INC` equals `PERCENTILE_CONT`; `PERCENTILE.EXC` does not.
 - Dapper maps zeros → column alias mismatch (`P25` vs `p25` is fine; `Median` vs `MedianPrice` is not).
 - Window tests flaky → the procedure uses `SYSUTCDATETIME()`; tests must pass `@AsOfUtc`.
+- A test that moves a job to `FailedState` sees it become `Scheduled` → Hangfire's `[AutomaticRetry]` intercepts failures until the job parameter `RetryCount` reaches `Attempts`; set `RetryCount` to simulate exhausted retries.
+- `MsSqlBuilder()` is obsolete (CS0618 with warnings-as-errors) → Testcontainers 4.15 wants the image in the constructor: `new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest")`.
 
 **Cut-if-late:** Weekly bucket (keep daily). Never cut the hand-computed percentile tests.
 

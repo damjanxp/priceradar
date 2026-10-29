@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Testcontainers fixture arrives on DAY-4 (spec §11.1). -->
+  <!-- Real SQL Server in Docker via Testcontainers (spec §11.1, D-27). Docker must be running. -->
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
@@ -16,6 +16,8 @@
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
     <PackageReference Include="Shouldly" />
+    <PackageReference Include="Respawn" />
+    <PackageReference Include="Testcontainers.MsSql" />
     <PackageReference Include="coverlet.collector" PrivateAssets="all" />
   </ItemGroup>
 
