@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IngestionService>();
         services.AddTransient<BookStatsQuery>();
         services.AddTransient<BookSearchQuery>();
+        services.AddScoped<LookupService>();
         services.AddPriceRadarHangfire(connectionString);
 
         // Fixture-backed sources (spec §4.5). The live Kupindo source is registered separately and stays disabled.

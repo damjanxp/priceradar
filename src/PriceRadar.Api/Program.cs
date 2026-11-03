@@ -1,6 +1,10 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Hangfire;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using PriceRadar.Api.Problems;
+using PriceRadar.Api.Security;
 using PriceRadar.Api.Health;
 using PriceRadar.Infrastructure;
 using PriceRadar.Infrastructure.Persistence;
@@ -23,10 +27,15 @@ try
         .Enrich.WithProperty("Application", "PriceRadar.Api"));
 
     builder.Services.AddPriceRadarInfrastructure(builder.Configuration);
-    builder.Services.AddControllers()
-        .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    builder.Services.AddControllers(o =>
+            // Validation errors are keyed by the JSON name the client sent ("maxPages"), not the C# name ("MaxPages").
+            o.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
+        // Enums as snake_case strings, as in spec §8: "cheap", "insufficient_data", "no_match", "succeeded".
+        .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
     builder.Services.AddOpenApi();
-    builder.Services.AddProblemDetails();
+    builder.Services.AddProblemDetails(o => o.CustomizeProblemDetails = ProblemTypes.Customize);
+    builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection(SecuritySettings.Section));
+    builder.Services.AddPriceRadarRateLimiting(builder.Configuration);
 
     builder.Services.AddHealthChecks()
         .AddDbContextCheck<PriceRadarDbContext>("sql", tags: [HealthTags.Ready])
@@ -40,8 +49,10 @@ try
     }
 
     app.UseSerilogRequestLogging();
+    app.UseSecurityHeaders();
     app.UseExceptionHandler();
     app.UseStatusCodePages();
+    app.UseRateLimiter();
 
     if (app.Environment.IsDevelopment())
     {

@@ -14,7 +14,10 @@ public enum BookSort
     LastSeenDesc,
 }
 
-/// <summary>Book list and search for GET /api/books (FR-12). The query text goes through the same normaliser as titles.</summary>
+/// <summary>
+/// Book list and search for GET /api/books (FR-12). The query text goes through the same normaliser as titles and must
+/// match the start of a word in the title or the author key ("drini", "andric", "АНДРИЋ").
+/// </summary>
 public sealed class BookSearchQuery(StagingConnectionString connectionString)
 {
     // Allow-listed ORDER BY fragments: user input never reaches the SQL text (spec §10.3).
@@ -31,14 +34,14 @@ public sealed class BookSearchQuery(StagingConnectionString connectionString)
         var norm = string.IsNullOrWhiteSpace(q) ? null : TextNormalizer.NormalizeTitle(q);
         var sql = $"""
             SELECT COUNT(*) FROM dw.Book AS b
-            WHERE @Norm IS NULL OR b.NormTitle LIKE @Prefix OR b.NormTitle LIKE @Word OR b.NormAuthor LIKE @Word;
+            WHERE @Norm IS NULL OR (' ' + b.NormTitle) LIKE @Word OR (' ' + b.NormAuthor) LIKE @Word;
 
             WITH page AS (
                 SELECT b.BookId, b.Title, b.Author,
                        (SELECT COUNT(*) FROM dw.Listing AS l WHERE l.BookId = b.BookId AND l.Status = 0) AS ActiveListings,
                        (SELECT MAX(l.LastSeenAtUtc) FROM dw.Listing AS l WHERE l.BookId = b.BookId) AS LastSeenAtUtc
                 FROM dw.Book AS b
-                WHERE @Norm IS NULL OR b.NormTitle LIKE @Prefix OR b.NormTitle LIKE @Word OR b.NormAuthor LIKE @Word
+                WHERE @Norm IS NULL OR (' ' + b.NormTitle) LIKE @Word OR (' ' + b.NormAuthor) LIKE @Word
                 ORDER BY {OrderBy[sort]}
                 OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
             )
@@ -55,7 +58,6 @@ public sealed class BookSearchQuery(StagingConnectionString connectionString)
         var args = new
         {
             Norm = norm,
-            Prefix = norm is null ? null : $"{Escape(norm)}%",
             Word = norm is null ? null : $"% {Escape(norm)}%",
             Skip = (page - 1) * pageSize,
             Take = pageSize,

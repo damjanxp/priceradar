@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.6 |
+| Version | 1.7 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.7 | 2026-11-03 | D. Petrov / Claude | DAY-5 results: `disappearedInWindow` field, snake_case enum values, DAY-5 lookup matching (exact, then title-only), three EF/MVC failure symptoms |
 | 1.6 | 2026-10-29 | D. Petrov / Claude | DAY-4 results: measured baseline (4,736 reads, window-spool finding), benchmark runner script, AutomaticRetry note |
 | 1.5 | 2026-10-29 | D. Petrov / Claude | DAY-3 results: presence numbers corrected to 121/6 (rejected rows never reach the warehouse), new books created in `usp_ApplyMatchResults`, `ScrapeRun.FixtureSet`, full-wipe `--reset`, two startup failure modes |
 | 1.4 | 2026-10-28 | D. Petrov / Claude | DAY-2 results folded in: Zipf–Mandelbrot skew (q = 10), measured seed output, `sqlcmd -I` failure symptom |
@@ -543,7 +544,7 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 | Not seen, last seen > 30 days ago | Becomes Disappeared, but is excluded from the "sold in last 30 days" count (stale) |
 | A Disappeared listing is seen again | `Status = Active`, `DisappearedAtUtc = NULL`, `MissedRunCount = 0` (it was not sold) |
 
-`GET …/stats` reports `disappearedLast30Days` and labels it everywhere (API field docs, UI tooltip) as **"Disappeared (sold proxy)"**. The rule logic is implemented and unit-tested in `Core/Presence/PresencePolicy`; the stored procedure does the same thing set-based, and an integration test asserts that both agree on fixture runs 001–003.
+`GET …/stats` reports `disappearedInWindow` (for the requested `windowDays`, default 30) and labels it everywhere (API field docs, UI tooltip) as **"Disappeared (sold proxy)"**. The rule logic is implemented and unit-tested in `Core/Presence/PresencePolicy`; the stored procedure does the same thing set-based, and an integration test asserts that both agree on fixture runs 001–003.
 
 **Fixture scenario (drives the DAY-3 and integration tests).** Scope `fixture:category:knjige`, N = 2, all runs complete.
 
@@ -572,7 +573,8 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 - **Pagination:** `page` (≥ 1, default 1), `pageSize` (1–100, default 20). Response envelope: `{ "items": [...], "page": 1, "pageSize": 20, "totalCount": 1234 }`.
 - **Sorting:** `sort` = field name, prefix `-` for descending; an allow-list per endpoint (unknown → 400).
 - **Validation:** DataAnnotations + custom validators → automatic `400` ValidationProblemDetails.
-- **Errors:** RFC 9457 ProblemDetails with `type`, `title`, `status`, `detail`, `instance` and `traceId` extensions (§8.3).
+- **Errors:** RFC 9457 ProblemDetails with `type`, `title`, `status`, `detail`, `instance` and `traceId` extensions (§8.3), served as `application/problem+json`; validation error keys use the JSON field names (`maxPages`).
+- **Enums** are serialised as snake_case strings: `cheap`, `insufficient_data`, `no_match`, `auto_matched`, `succeeded`.
 - **Write endpoints** require `X-Api-Key` when `Security:ApiKey` is set. `POST /api/ingestion/runs` accepts an optional `Idempotency-Key` header (GUID).
 
 ### 8.2 Endpoint table
@@ -595,9 +597,9 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 ```json
 {
   "bookId": 1201, "windowDays": 30, "asOfUtc": "2026-11-08T10:15:00Z", "currency": "RSD",
-  "sampleSize": 21, "activeListings": 14, "disappearedLast30Days": 3,
+  "sampleSize": 21, "activeListings": 14, "disappearedInWindow": 3,
   "min": 300.00, "p25": 550.00, "median": 700.00, "p75": 900.00, "max": 2000.00,
-  "notes": ["disappearedLast30Days is a sold proxy, not confirmed sales"]
+  "notes": ["disappearedInWindow is a sold proxy (listings gone for 2 complete runs), not confirmed sales"]
 }
 ```
 
@@ -627,7 +629,7 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 
 ### 8.4 Lookup algorithm and verdict
 
-1. Normalise the input (§6.1) → exact `NormKey` → candidate index → score (§6.3).
+1. Normalise the input (§6.1) → exact `NormKey` → candidate index → score (§6.3). *Until DAY-7:* exact `NormKey`, then title-only (decisive only when the query has no author and exactly one book has that title; otherwise `ambiguous` with up to 3 candidates).
 2. AutoMatch → stats via `dw.usp_GetBookStats`. Ambiguous → read-only `MatchCache` lookup; on a miss, return `match.status = "ambiguous"` with the top 3 candidates and `verdict = null` (the UI lets the user tap a candidate and then calls `/api/books/{id}/stats`). No match → `"no_match"`, `verdict = "unknown"`.
 3. Verdict (D-22), with *n* = `sampleSize`:
 
@@ -647,7 +649,7 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
   "match": { "status": "matched", "method": "rule", "bookId": 1201, "title": "Na Drini ćuprija",
              "author": "Ivo Andrić", "score": 1.0, "candidates": [] },
   "verdict": "cheap", "confidence": "high",
-  "stats": { "sampleSize": 21, "activeListings": 14, "disappearedLast30Days": 3,
+  "stats": { "sampleSize": 21, "activeListings": 14, "disappearedInWindow": 3,
              "min": 300.00, "p25": 550.00, "median": 700.00, "p75": 900.00, "max": 2000.00, "windowDays": 30 },
   "explanation": "400 RSD is below the 25th percentile (550 RSD) of 21 listings seen in the last 30 days.",
   "elapsedMs": 23
@@ -1154,6 +1156,10 @@ Cross-check one verdict by hand: take `p25`/`p75` from `/stats` and ask with `as
 - `askingPrice` with a comma (`"400,50"`) fails → culture; parse with invariant culture and document "use a dot".
 - Rate limiter never triggers → `UseRateLimiter()` placed before routing, or the policy is not attached to the endpoint.
 - Lookup slow (> 1 s) on the first call → the candidate index is built lazily; warm it in a hosted service at startup.
+- 500 with *"The LINQ expression … could not be translated"* → EF cannot `ORDER BY` a member of a record built through its constructor, nor `GROUP BY` a navigation property (`l.Source.Code`); project to an anonymous type / group on the FK column first.
+- Problem responses arrive as `application/json` → a controller-level `[Produces("application/json")]` overrides the `application/problem+json` content type; remove it (`[ProducesResponseType]` still documents the API).
+- Search for an author finds nothing → `LIKE '% word%'` needs a leading space; match against `' ' + column` so the first word counts too.
+- Lookups give `insufficient_data` for every book → the seeded data is older than the window; re-seed without `--end-date` before a demo.
 
 **Cut-if-late:** The `sort` options beyond the default and the `Idempotency-Key` replay response. Never cut validation and ProblemDetails.
 

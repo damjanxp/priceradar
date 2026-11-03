@@ -37,6 +37,7 @@ services:
       <<: *dotnet-env
       ASPNETCORE_ENVIRONMENT: Development   # local stack: Scalar UI and an open Hangfire dashboard
       Database__ApplyMigrationsOnStartup: "true"
+      Security__ApiKey: ${PRICERADAR_API_KEY:-dev-key}   # local default; override in .env
     ports:
       - "5080:8080"
     volumes:

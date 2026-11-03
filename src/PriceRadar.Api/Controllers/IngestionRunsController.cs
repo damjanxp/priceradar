@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using PriceRadar.Api.Problems;
+using PriceRadar.Api.Security;
 using PriceRadar.Core.Domain;
 using PriceRadar.Infrastructure.Ingestion;
 using PriceRadar.Infrastructure.Persistence;
@@ -10,17 +12,20 @@ namespace PriceRadar.Api.Controllers;
 
 [ApiController]
 [Route("api/ingestion/runs")]
-[Produces("application/json")]
 public sealed class IngestionRunsController(IngestionService ingestion, PriceRadarDbContext db) : ControllerBase
 {
     /// <summary>Triggers an ingestion run; the pipeline executes asynchronously in the Worker (FR-2).</summary>
     [HttpPost]
+    [RequireApiKey]
+    [EnableRateLimiting(RateLimitPolicies.Ingestion)]
     [RequestSizeLimit(16 * 1024)]
     [ProducesResponseType<RunDto>(StatusCodes.Status202Accepted)]
     [ProducesResponseType<RunDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Create(
         [FromBody] CreateRunRequest request,
         [FromHeader(Name = "Idempotency-Key")] Guid? idempotencyKey,
@@ -28,7 +33,7 @@ public sealed class IngestionRunsController(IngestionService ingestion, PriceRad
     {
         var result = await ingestion.CreateRunAsync(
             new CreateRunCommand(request.Source, request.Query, request.MaxPages, request.FixtureSet),
-            idempotencyKey, requestedBy: "anonymous", ct);
+            idempotencyKey, requestedBy: Request.Headers.ContainsKey(SecuritySettings.HeaderName) ? "api-key" : "anonymous", ct);
 
         return result.Outcome switch
         {

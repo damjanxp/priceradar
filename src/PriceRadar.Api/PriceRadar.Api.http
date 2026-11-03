@@ -1,0 +1,71 @@
+# Every endpoint from spec §8.2. Run in VS Code (REST Client), Rider or Visual Studio.
+# Book IDs come from `seed --seed 42`: 6442 is the hottest book, 1 is "Na Drini ćuprija".
+@base = http://localhost:5080
+@apiKey = dev-key
+
+### Health: liveness and readiness (SQL + Hangfire)
+GET {{base}}/health
+###
+GET {{base}}/health/ready
+
+### Books: search (normalised: Cyrillic and diacritics work), paging, sorting
+GET {{base}}/api/books?q=drini&page=1&pageSize=5
+###
+GET {{base}}/api/books?q=АНДРИЋ&sort=-listingCount
+###
+GET {{base}}/api/books?sort=-lastSeen&pageSize=3
+
+### Book detail
+GET {{base}}/api/books/1
+### 404 ProblemDetails
+GET {{base}}/api/books/99999999
+
+### Stats (FR-13)
+GET {{base}}/api/books/6442/stats?windowDays=30
+###
+GET {{base}}/api/books/6442/stats?windowDays=400
+
+### Listings (FR-14)
+GET {{base}}/api/books/6442/listings?status=active&sort=-price&pageSize=5
+###
+GET {{base}}/api/books/1/listings?status=all
+
+### Price history (FR-14)
+GET {{base}}/api/books/6442/price-history?bucket=week
+###
+GET {{base}}/api/books/6442/price-history?from=2026-10-10&to=2026-10-01
+
+### Lookup (FR-15): the flea-market question
+GET {{base}}/api/lookup?title=Na Drini cuprija&author=Ivo Andric&askingPrice=400
+###
+GET {{base}}/api/lookup?title=НА ДРИНИ ЋУПРИЈА&askingPrice=900
+### Ambiguous: two books called "Pesme"
+GET {{base}}/api/lookup?title=Pesme&askingPrice=300
+### 400 validation
+GET {{base}}/api/lookup?title=x&askingPrice=0
+
+### Ingestion runs (FR-2, FR-17): needs X-Api-Key
+POST {{base}}/api/ingestion/runs
+Content-Type: application/json
+X-Api-Key: {{apiKey}}
+
+{ "source": "fixture", "fixtureSet": "run-001" }
+
+### Same request with an Idempotency-Key: the second call returns the existing run (200)
+POST {{base}}/api/ingestion/runs
+Content-Type: application/json
+X-Api-Key: {{apiKey}}
+Idempotency-Key: 7d9f5a2e-1c3b-4e8f-9a6d-2b4c8e1f0a37
+
+{ "source": "kp", "fixtureSet": "run-001" }
+
+### 401 without key
+POST {{base}}/api/ingestion/runs
+Content-Type: application/json
+
+{ "source": "fixture", "fixtureSet": "run-001" }
+
+###
+GET {{base}}/api/ingestion/runs?pageSize=5
+###
+GET {{base}}/api/ingestion/runs/181
