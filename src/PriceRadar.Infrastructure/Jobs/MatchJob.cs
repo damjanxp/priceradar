@@ -6,17 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PriceRadar.Core.Domain;
+using PriceRadar.Core.Matching;
 using PriceRadar.Core.Normalization;
+using PriceRadar.Infrastructure.Matching;
 using PriceRadar.Infrastructure.Options;
 using PriceRadar.Infrastructure.Persistence;
 
 namespace PriceRadar.Infrastructure.Jobs;
 
 /// <summary>
-/// Step 2: parse prices, normalise text and match each staged listing to a canonical book (spec §6). DAY-3 matching is
-/// exact <c>NormKey</c> only: a hit is AutoMatched, anything else becomes a NewBook. Fuzzy scoring arrives on DAY-7.
+/// Step 2: parse prices, normalise text and match each staged listing to a canonical book (spec §6.1–6.4): exact key or
+/// a clear fuzzy winner is AutoMatched, no plausible candidate makes a NewBook, anything in between stays Pending for
+/// ResolveJob (match cache, then Claude).
 /// </summary>
-public sealed class MatchJob(PriceRadarDbContext db, IOptions<PricingSettings> pricing, ILogger<MatchJob> logger)
+public sealed class MatchJob(PriceRadarDbContext db, IOptions<PricingSettings> pricing, IOptions<MatchingSettings> matching, ILogger<MatchJob> logger)
 {
     [Queue(HangfireQueues.Match)]
     [AutomaticRetry(Attempts = 2, DelaysInSeconds = [30, 120])]
@@ -36,40 +39,34 @@ public sealed class MatchJob(PriceRadarDbContext db, IOptions<PricingSettings> p
             .Select(s => new { s.StagingListingId, s.RawTitle, s.RawAuthor, s.RawPrice })
             .ToListAsync(ct);
 
-        var knownAuthors = (await db.Books.AsNoTracking().Where(b => b.NormAuthor != "").Select(b => b.NormAuthor).Distinct().ToListAsync(ct))
-            .ToHashSet(StringComparer.Ordinal);
+        var catalog = await BookCatalog.LoadAsync(db, ct);
+        var decider = new MatchDecider(catalog.Index, matching.Value.ToOptions());
         var priceOptions = pricing.Value.For(run.EurRsdRate);
 
-        var results = rows.Select(r => Decide(r.StagingListingId, r.RawTitle, r.RawAuthor, r.RawPrice, priceOptions, knownAuthors)).ToList();
-
-        var keys = results.Where(r => r.ProcessStatus == ProcessStatus.Normalized).Select(r => r.NormKey).Distinct().ToList();
-        var existing = await db.Books.AsNoTracking().Where(b => keys.Contains(b.NormKey))
-            .ToDictionaryAsync(b => b.NormKey, b => b.BookId, StringComparer.Ordinal, ct);
-
+        var results = rows.Select(r => Decide(r.StagingListingId, r.RawTitle, r.RawAuthor, r.RawPrice, priceOptions, catalog.AuthorKeys)).ToList();
         foreach (var r in results.Where(r => r.ProcessStatus == ProcessStatus.Normalized))
         {
-            if (existing.TryGetValue(r.NormKey, out var bookId))
+            var d = decider.Decide(r.NormTitle, r.NormAuthor);
+            r.MatchScore = d.Best is { } best ? (decimal)Math.Round(best.Score, 4) : null;
+            (r.BookId, r.MatchStatus) = d.Outcome switch
             {
-                r.BookId = bookId;
-                r.MatchStatus = MatchStatus.AutoMatched;
-                r.MatchScore = 1.0m;
-            }
-            else
-            {
-                r.MatchStatus = MatchStatus.NewBook;
-            }
+                MatchOutcome.AutoMatch => (d.BookId, MatchStatus.AutoMatched),
+                MatchOutcome.Ambiguous => ((int?)null, MatchStatus.Pending),
+                _ => ((int?)null, MatchStatus.NewBook),
+            };
         }
 
-        await ApplyAsync(scrapeRunId, results, ct);
+        await ApplyAsync(db, scrapeRunId, results, ct);
 
         run.Stage = RunStage.Matched;
         run.ListingsRejected = results.Count(r => r.ProcessStatus == ProcessStatus.Rejected);
         await db.SaveChangesAsync(ct);
 
         logger.LogInformation(
-            "Run {RunId}: {Total} listings → {Auto} auto-matched, {New} new books, {Rejected} rejected",
+            "Run {RunId}: {Total} listings → {Auto} auto-matched, {Ambiguous} ambiguous, {New} new books, {Rejected} rejected ({Books} books indexed)",
             scrapeRunId, results.Count, results.Count(r => r.MatchStatus == MatchStatus.AutoMatched),
-            results.Count(r => r.MatchStatus == MatchStatus.NewBook), run.ListingsRejected);
+            results.Count(r => r is { MatchStatus: MatchStatus.Pending, ProcessStatus: ProcessStatus.Normalized }),
+            results.Count(r => r.MatchStatus == MatchStatus.NewBook), run.ListingsRejected, catalog.Index.Count);
     }
 
     internal static MatchResult Decide(long id, string rawTitle, string? rawAuthor, string? rawPrice, PricingOptions pricing,
@@ -98,7 +95,8 @@ public sealed class MatchJob(PriceRadarDbContext db, IOptions<PricingSettings> p
         return result;
     }
 
-    private async Task ApplyAsync(long scrapeRunId, List<MatchResult> results, CancellationToken ct)
+    /// <summary>Writes decisions through ingest.usp_ApplyMatchResults (which also creates new books).</summary>
+    internal static async Task ApplyAsync(PriceRadarDbContext db, long scrapeRunId, List<MatchResult> results, CancellationToken ct)
     {
         if (results.Count == 0)
         {

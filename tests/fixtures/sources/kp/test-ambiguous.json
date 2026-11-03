@@ -1,0 +1,15 @@
+{
+  "source": "kp",
+  "scopeKey": "kp:category:knjige",
+  "capturedAtUtc": "2026-11-01T10:00:00Z",
+  "pages": 1,
+  "note": "Invented listings for the AI-resolution integration tests: 4 ads in 2 ambiguous groups (no author), 1 exact match, 1 new book.",
+  "listings": [
+    { "externalId": "900001", "title": "Na Drini cuprija", "author": null, "price": "600 din", "condition": "Korišćeno", "url": "https://kp.priceradar.local/knjige/oglas/900001", "postedAtUtc": "2026-10-30T08:00:00Z" },
+    { "externalId": "900002", "title": "NA DRINI ĆUPRIJA - kao nova", "author": null, "price": "7 €", "condition": "Kao novo (polovno)", "url": "https://kp.priceradar.local/knjige/oglas/900002", "postedAtUtc": "2026-10-30T09:00:00Z" },
+    { "externalId": "900003", "title": "На Дрини ћуприја", "author": null, "price": "750 din", "condition": "Korišćeno", "url": "https://kp.priceradar.local/knjige/oglas/900003", "postedAtUtc": "2026-10-30T10:00:00Z" },
+    { "externalId": "900004", "title": "Prokleta avlija", "author": null, "price": "450 din", "condition": "Korišćeno", "url": "https://kp.priceradar.local/knjige/oglas/900004", "postedAtUtc": "2026-10-30T11:00:00Z" },
+    { "externalId": "900005", "title": "Prokleta avlija", "author": "Ivo Andrić", "price": "500 din", "condition": "Korišćeno", "url": "https://kp.priceradar.local/knjige/oglas/900005", "postedAtUtc": "2026-10-30T12:00:00Z" },
+    { "externalId": "900006", "title": "Hazarski rečnik", "author": "Milorad Pavić", "price": "900 din", "condition": "Novo - neotpakovano", "url": "https://kp.priceradar.local/knjige/oglas/900006", "postedAtUtc": "2026-10-30T13:00:00Z" }
+  ]
+}

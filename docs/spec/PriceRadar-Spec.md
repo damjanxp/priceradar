@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.8 |
+| Version | 1.9 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.9 | 2026-11-03 | D. Petrov / Claude | DAY-7 results: golden-set metrics and grid, same-author candidate fallback, roman volume numerals (N7b), document-frequency stop rule, cached Error answers, lookup methods, two failure symptoms |
 | 1.8 | 2026-11-03 | D. Petrov / Claude | DAY-6 results: covering index + empty columnstore for batch mode (D-40), measured before/after, parameter sniffing, Query Store, k6; four failure symptoms |
 | 1.7 | 2026-11-03 | D. Petrov / Claude | DAY-5 results: `disappearedInWindow` field, snake_case enum values, DAY-5 lookup matching (exact, then title-only), three EF/MVC failure symptoms |
 | 1.6 | 2026-10-29 | D. Petrov / Claude | DAY-4 results: measured baseline (4,736 reads, window-spool finding), benchmark runner script, AutomaticRetry note |
@@ -438,6 +439,7 @@ Applied identically to listing titles/authors, canonical books and lookup querie
 | N5 | Punctuation and symbols → space (keep digits) | `"Prokleta avlija (1954.)"` → `"prokleta avlija 1954"` |
 | N6 | Remove noise phrases (longest first) from `NoiseLexicon`: `kao nova`, `nova`, `novo`, `nekorisceno`, `odlicno ocuvana`, `ocuvana`, `izdanje`, `\d+\. izd`, `tvrd(i)? povez`, `meki povez`, `knjiga`, `roman`, `prodajem`, `hitno`, `akcija`, `povoljno`, `gratis`, `lot` | `"na drini cuprija kao nova tvrd povez"` → `"na drini cuprija"` |
 | N7 | Remove 4-digit years 1900–2099; keep other numbers (volume numbers matter: `"Seobe 2"`) | `"prokleta avlija 1954"` → `"prokleta avlija"` |
+| N7b | Roman volume numerals after the first word become digits: `ii`–`iv`, `vi`–`ix` (`i`, `v` and `x` are left alone: Serbian words or too ambiguous). Added on DAY-7 after the golden set caught "Seobe II" auto-matching volume 1 | `"seobe ii"` → `"seobe 2"` |
 | N8 | Author handling: split `"Author - Title"` / `"Title - Author"` when the author field is empty and one side matches a known author token set; author key = sorted surname-first tokens; single-letter initials kept as initials | `"Andric Ivo"`, `"I. Andric"` → tokens `{andric, ivo}` / `{andric, i}` |
 
 The output is ASCII `varchar` (cheaper to index and compare). The display form keeps the original diacritics.
@@ -445,9 +447,10 @@ The output is ASCII `varchar` (cheaper to index and compare). The display form k
 ### 6.2 Candidate generation (`CandidateIndex`)
 
 - An in-memory inverted index from title token → `BookId[]`, built from `dw.Book` at the start of each `MatchJob` (20k books ≈ a few MB; build time < 1 s) (D-13).
-- Tokens shorter than 3 characters and the 50 most frequent tokens (IDF stop list) are not indexed.
+- Tokens shorter than 3 characters and tokens found in more than 10 % of titles are not indexed. (A fixed "50 most frequent" list would remove every word of the synthetic 20k-book catalogue, which uses a small vocabulary.)
 - Candidates are the books sharing ≥ 1 indexed title token, ranked by the sum of IDF weights of the shared tokens; keep the top 20 (`Matching:MaxCandidates`). An exact `NormKey` hit short-circuits to score 1.0.
-- The lookup endpoint uses the same index through a singleton that refreshes when `dw.Book` changes (version check every 60 s).
+- **Same-author fallback (DAY-7):** books by the same author key are always added after the token candidates. Without it a one-word title with a typo ("Gospoiđca", "Pese") shares no token with its book and becomes a duplicate; the golden set found six such cases.
+- The lookup endpoint uses the same index through a singleton (`BookCatalogProvider`) that rebuilds it when the book count or max `BookId` changed (checked at most every 60 s). Jobs build a fresh index per run.
 
 ### 6.3 Similarity metric (`SimilarityScorer`)
 
@@ -474,7 +477,15 @@ Score     = 0.7 · TitleSim + 0.3 · AuthorSim                  # both sides hav
 
 <p class="caption">Figure 4 — Matching decision flow for one listing.</p>
 
-All values live in `Matching:*` configuration. They are **tuned on DAY-7** against `tests/fixtures/matching-golden.csv`: about 150 hand-labelled (listing, expected BookId or `NEW`) pairs covering Cyrillic, diacritics, swapped author order, typos, multi-volume works and "same title, different author" traps. A unit test prints precision/recall/ambiguous-rate per threshold pair, and the chosen pair is recorded in the README.
+All values live in `Matching:*` configuration. They were **tuned on DAY-7** against `tests/fixtures/matching/golden.csv`: 169 labelled listings against a 42-book catalogue (`catalog.csv`). 126 are known-answer spelling variants of catalogue books (Cyrillic, ASCII, upper case, noise, author in title, swapped author, initials, typos, no author), 25 are real books *not* in the catalogue, and 18 are hand-written traps (volumes, same title by two authors, roman numerals, original-language spellings). Generated by `make_golden.py`; `GoldenSetTests` prints the grid.
+
+| Thresholds (auto / new) | Auto precision | Auto recall | Ambiguous (→ Claude) | Missed duplicates | Wrong auto-matches |
+|---|---|---|---|---|---|
+| 0.85 / 0.65 | 99.3 % | 97.9 % | 3.6 % | 0 | 1 |
+| **0.90 / 0.65 (chosen)** | **100.0 %** | **88.7 %** | **11.8 %** | **0** | **0** |
+| 0.95 / 0.65 | 100.0 % | 85.1 % | 14.8 % | 0 | 0 |
+
+0.90 is the lowest auto threshold with no wrong auto-match; the remaining 11.8 % are mostly listings without an author (capped at 0.85 by design). Before the two DAY-7 fixes the same grid showed 6 missed duplicates and 1 wrong auto-match ("Seobe II" → volume 1).
 
 ### 6.5 Claude prompt contract
 
@@ -529,6 +540,7 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 
 - **Key:** `InputHash = SHA-256(PromptVersion + "|" + NormTitle + "|" + NormAuthor)`. Raw noise ("kao nova") is normalised away *before* hashing, so variants of one ad share one entry. Candidates are not in the key: if a matching book is created later, the deterministic matcher finds it first (exact `NormKey`), so the stale cache entry is never reached (D-18).
 - **In-run dedup:** ambiguous rows are grouped by `InputHash` before any call, so one call serves all identical ads in a run.
+- **Error answers are cached too** (a `bookId` outside the candidates, `max_tokens`): the rows stay `Pending`, and the same string is not re-sent until the prompt version changes. Transport failures (429/5xx after retries, timeouts) and rejected requests (400/401) are *not* cached; a rejected request stops AI calls for the rest of the run.
 - **Invalidation:** only by bumping `Ai:PromptVersion`. Old rows stay for comparison (an evidence table: v1 vs v2 decisions).
 - **Budget guard:** `Ai:MaxCallsPerRun` (200) and `Ai:DailyBudgetUsd` (0.50), computed from `SUM(InputTokens, OutputTokens)` today × configured prices (`Ai:PricePerMTokIn = 0.10`, `Ai:PricePerMTokOut = 0.50` USD for Haiku 5.5). When exceeded: no call, the row stays `Pending`, and a warning is logged with the remaining count.
 - **Expected cost:** ≈ 600 input + 150 output tokens per call ≈ 0.00014 USD. 1,000 ambiguous listings ≈ 0.14 USD. With 3–5 test runs the project stays under NFR-10.
@@ -632,7 +644,7 @@ The client validates the semantics as well: when `decision = match`, `bookId` mu
 ### 8.4 Lookup algorithm and verdict
 
 1. Normalise the input (§6.1) → exact `NormKey` → candidate index → score (§6.3). *Until DAY-7:* exact `NormKey`, then title-only (decisive only when the query has no author and exactly one book has that title; otherwise `ambiguous` with up to 3 candidates).
-2. AutoMatch → stats via `dw.usp_GetBookStats`. Ambiguous → read-only `MatchCache` lookup; on a miss, return `match.status = "ambiguous"` with the top 3 candidates and `verdict = null` (the UI lets the user tap a candidate and then calls `/api/books/{id}/stats`). No match → `"no_match"`, `verdict = "unknown"`.
+2. AutoMatch → stats via `dw.usp_GetBookStats` (`match.method`: `rule` for an exact key, `fuzzy` for a scored match). Ambiguous → read-only `MatchCache` lookup (`method: ai-cache` on a cached match); on a miss, return `match.status = "ambiguous"` with the top 3 candidates and their scores and `verdict = null` (the UI lets the user tap a candidate and then calls `/api/books/{id}/stats`). No match → `"no_match"`, `verdict = "unknown"`.
 3. Verdict (D-22), with *n* = `sampleSize`:
 
 | Condition | Verdict |
@@ -1044,7 +1056,7 @@ Concurrency check: send two POSTs back to back (`1..2 | % { Invoke-WebRequest �
 - DI errors inside jobs → a scoped `DbContext` resolved from a singleton; let Hangfire activate jobs per scope.
 - Presence counts off → the run is not marked `IsComplete`, or the scope key differs between fixture runs.
 - 500 instead of 409 → SqlException 2601/2627 is not translated in the ingestion service.
-- Api exits with *error 1801 "Database 'PriceRadar' already exists"* right after the SQL container restarted → the server accepts logins (healthcheck green) while the database is still recovering; EF cannot open it, assumes it is missing and runs `CREATE DATABASE`. Fixed by waiting until `sys.databases.state_desc` is ONLINE (or the database is absent) before migrating.
+- Api exits with *error 1801 "Database 'PriceRadar' already exists"* right after the SQL container restarted → the server accepts logins (healthcheck green) while the database is still recovering; EF cannot open it, assumes it is missing and runs `CREATE DATABASE`. Fixed by waiting until the database is absent, or ONLINE **and** a real connection to it succeeds (DAY-7: `ONLINE` alone still let error 4060 through once; compose then never started the Worker).
 - Run IDs jump by 10,000 (e.g. 10181) → SQL Server's identity cache after an unclean shutdown; `DELETE` and `DBCC CHECKIDENT … RESEED` never lower it. Harmless; `seed --reset` reseeds to 1.
 - A run stays Running for minutes → a non-transient error is being retried (30/120/300 s). Unknown fixture sets are therefore rejected with 400 at request time.
 
@@ -1248,7 +1260,7 @@ python db/benchmarks/experiments.py sniffing              # also: columnstore, c
 **Tasks**
 
 - [ ] `CandidateIndex` (inverted index + IDF) and `SimilarityScorer` (FuzzySharp + Jaro-Winkler) with unit tests (2 h)
-- [ ] `matching-golden.csv` (~150 labelled pairs) + golden test that prints the precision/recall/ambiguous rate grid; choose the thresholds (1.5 h)
+- [ ] `tests/fixtures/matching/golden.csv` (169 labelled listings) + golden test that prints the precision/recall/ambiguous rate grid; choose the thresholds (1.5 h)
 - [ ] `ClaudeMatchResolver`: typed HttpClient, resilience handler, request per §6.5, structured output, stop-reason handling, fake-handler tests (2 h)
 - [ ] `MatchCacheRepository` + hashing + in-run dedup + budget guard; `ResolveJob` wired in (1.5 h)
 - [ ] Run fixtures and a synthetic batch end-to-end; record calls, cache hits, tokens and cost (1 h)
@@ -1292,6 +1304,8 @@ SELECT MatchStatus, COUNT(*) FROM dw.Listing GROUP BY MatchStatus;              
 - JSON parse errors → reading a `thinking` block instead of the first `text` block.
 - Claude returns an unknown `bookId` → must be caught by the candidate-set validation (test exists).
 - Golden precision drops after a normaliser change → rerun the grid; thresholds and noise lexicon interact.
+- Integration tests expecting Claude calls see zero → the test data contains no ambiguous listing for that catalogue; use the explicit `kp/test-ambiguous.json` fixture (4 author-less ads in 2 groups).
+- Live run makes 0 Claude calls and logs *"AI disabled"* → no `Ai:ApiKey` for the **Worker** (user-secrets of `src/PriceRadar.Worker`, or `ANTHROPIC_API_KEY` in `.env` for compose). Without a key, ambiguous rows stay Pending by design.
 
 **Cut-if-late (per cut order):** Keep the cache + fake resolver + budget guard; skip live tuning and prompt v2. If very late, ambiguous → `Pending` with a clear README note. Never cut the golden test.
 

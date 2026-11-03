@@ -1,7 +1,13 @@
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using PriceRadar.Core.Domain;
+using PriceRadar.Core.Matching;
 using PriceRadar.Core.Normalization;
 using PriceRadar.Core.Pricing;
+using PriceRadar.Infrastructure.Ai;
+using PriceRadar.Infrastructure.Matching;
+using PriceRadar.Infrastructure.Options;
 using PriceRadar.Infrastructure.Persistence;
 
 namespace PriceRadar.Infrastructure.Queries;
@@ -13,7 +19,7 @@ public enum LookupMatchStatus
     NoMatch,
 }
 
-public sealed record LookupCandidate(int BookId, string Title, string? Author, int ActiveListings);
+public sealed record LookupCandidate(int BookId, string Title, string? Author, decimal Score, int ActiveListings);
 
 public sealed record LookupMatch(LookupMatchStatus Status, string? Method, int? BookId, string? Title, string? Author, decimal? Score,
     IReadOnlyList<LookupCandidate> Candidates);
@@ -24,11 +30,18 @@ public sealed record LookupResult(LookupQueryEcho Query, LookupMatch Match, Verd
     string Explanation, long ElapsedMs);
 
 /// <summary>
-/// GET /api/lookup (FR-15, spec §8.4): normalise the query, find the canonical book, compare the asking price with its
-/// statistics. Deterministic only — the lookup never calls the Claude API (D-19). DAY-5 matching is exact NormKey, then
-/// title-only; the candidate index with fuzzy scores replaces the fallback on DAY-7.
+/// GET /api/lookup (FR-15, spec §8.4): normalise the query, find the canonical book with the same matcher as the
+/// pipeline, compare the asking price with its statistics. Never calls the Claude API (D-19): an ambiguous query is
+/// answered from match.MatchCache when the pipeline already resolved the same string, otherwise the candidates are
+/// returned for the user to pick.
 /// </summary>
-public sealed class LookupService(PriceRadarDbContext db, BookStatsQuery stats)
+public sealed class LookupService(
+    PriceRadarDbContext db,
+    BookStatsQuery stats,
+    BookCatalogProvider catalogs,
+    MatchCacheService cache,
+    IOptions<MatchingSettings> matching,
+    IOptions<AiSettings> ai)
 {
     private const int MaxCandidates = 3;
 
@@ -43,7 +56,7 @@ public sealed class LookupService(PriceRadarDbContext db, BookStatsQuery stats)
         if (match.Status != LookupMatchStatus.Matched)
         {
             var explanation = match.Status == LookupMatchStatus.Ambiguous
-                ? $"{match.Candidates.Count} books match this title; pick one to see its price statistics."
+                ? $"{match.Candidates.Count} books could match; pick one to see its price statistics."
                 : "No book in the catalogue matches this title and author.";
             return new LookupResult(echo, match, match.Status == LookupMatchStatus.NoMatch ? Verdict.Unknown : null, null, null,
                 explanation, sw.ElapsedMilliseconds);
@@ -59,42 +72,47 @@ public sealed class LookupService(PriceRadarDbContext db, BookStatsQuery stats)
     {
         if (normTitle.Length == 0)
         {
-            return new LookupMatch(LookupMatchStatus.NoMatch, null, null, null, null, null, []);
+            return NoMatch();
         }
 
-        var key = $"{normAuthor}|{normTitle}";
-        var exact = await db.Books.AsNoTracking().Where(b => b.NormKey == key)
-            .Select(b => new { b.BookId, b.Title, b.Author }).SingleOrDefaultAsync(ct);
-        if (exact is not null)
+        var catalog = await catalogs.GetAsync(ct);
+        var decision = new MatchDecider(catalog.Index, matching.Value.ToOptions()).Decide(normTitle, normAuthor);
+
+        switch (decision.Outcome)
         {
-            return new LookupMatch(LookupMatchStatus.Matched, "rule", exact.BookId, exact.Title, exact.Author, 1.0m, []);
+            case MatchOutcome.AutoMatch:
+                var b = decision.Best!;
+                return new LookupMatch(LookupMatchStatus.Matched, b.Score >= 1.0 ? "rule" : "fuzzy", b.Book.BookId, b.Book.Title, b.Book.Author,
+                    Round(b.Score), []);
+
+            case MatchOutcome.Ambiguous:
+                var cached = await cache.FindAsync(MatchCacheService.Hash(ai.Value.PromptVersion, normTitle, normAuthor), ct);
+                if (cached is { Decision: MatchDecision.Match, ResolvedBookId: { } id } && catalog.Index.Get(id) is { } book)
+                {
+                    return new LookupMatch(LookupMatchStatus.Matched, "ai-cache", id, book.Title, book.Author, cached.Confidence, []);
+                }
+
+                return new LookupMatch(LookupMatchStatus.Ambiguous, null, null, null, null, Round(decision.Best!.Score),
+                    await WithListingCountsAsync(decision.Candidates.Take(MaxCandidates).ToList(), ct));
+
+            default:
+                return NoMatch();
         }
-
-        // Same title, any author: decisive only when the query has no author and exactly one book has that title.
-        // Anonymous projection first: EF cannot ORDER BY a member of a record built through its constructor.
-        var sameTitle = (await db.Books.AsNoTracking()
-            .Where(b => b.NormTitle == normTitle)
-            .Select(b => new
-            {
-                b.BookId,
-                b.Title,
-                b.Author,
-                ActiveListings = db.Listings.Count(l => l.BookId == b.BookId && l.Status == Core.Domain.ListingStatus.Active),
-            })
-            .OrderByDescending(c => c.ActiveListings).ThenBy(c => c.BookId)
-            .Take(MaxCandidates + 1)
-            .ToListAsync(ct))
-            .Select(c => new LookupCandidate(c.BookId, c.Title, c.Author, c.ActiveListings))
-            .ToList();
-
-        if (normAuthor.Length == 0 && sameTitle.Count == 1)
-        {
-            var only = sameTitle[0];
-            return new LookupMatch(LookupMatchStatus.Matched, "rule-title", only.BookId, only.Title, only.Author, null, []);
-        }
-
-        return sameTitle.Count > 0
-            ? new LookupMatch(LookupMatchStatus.Ambiguous, null, null, null, null, null, sameTitle.Take(MaxCandidates).ToList())
-            : new LookupMatch(LookupMatchStatus.NoMatch, null, null, null, null, null, []);
     }
+
+    private async Task<IReadOnlyList<LookupCandidate>> WithListingCountsAsync(List<ScoredCandidate> candidates, CancellationToken ct)
+    {
+        var ids = candidates.Select(c => c.Book.BookId).ToList();
+        var active = await db.Listings.AsNoTracking()
+            .Where(l => l.BookId != null && ids.Contains(l.BookId.Value) && l.Status == ListingStatus.Active)
+            .GroupBy(l => l.BookId!.Value)
+            .Select(g => new { BookId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.BookId, x => x.Count, ct);
+        return candidates.Select(c => new LookupCandidate(c.Book.BookId, c.Book.Title, c.Book.Author, Round(c.Score), active.GetValueOrDefault(c.Book.BookId)))
+            .ToList();
+    }
+
+    private static LookupMatch NoMatch() => new(LookupMatchStatus.NoMatch, null, null, null, null, null, []);
+
+    private static decimal Round(double score) => Math.Round((decimal)score, 3);
 }

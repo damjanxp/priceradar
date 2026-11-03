@@ -26,6 +26,13 @@ public static partial class TextNormalizer
         "akcija", "povoljno", "gratis", "lot", "polovno", "polovna",
     ];
 
+    // N7b: volume numerals after the first word ("Seobe II" = "Seobe 2"). "i" and "v" are left alone: in Serbian they
+    // are words ("and", "in"), and "x" is too ambiguous.
+    private static readonly Dictionary<string, string> RomanVolumes = new(StringComparer.Ordinal)
+    {
+        ["ii"] = "2", ["iii"] = "3", ["iv"] = "4", ["vi"] = "6", ["vii"] = "7", ["viii"] = "8", ["ix"] = "9",
+    };
+
     /// <summary>N1–N7 for a title: fold to ASCII, drop noise phrases and 4-digit years, keep other numbers.</summary>
     public static string NormalizeTitle(string? title)
     {
@@ -44,6 +51,7 @@ public static partial class TextNormalizer
         var tokens = text.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
         tokens = tokens
             .Where((t, i) => !IsYear(t) && !(i > 0 && NoiseWords.Contains(t)) && !IsEditionNumber(tokens, i))
+            .Select((t, i) => i > 0 && RomanVolumes.TryGetValue(t, out var digit) ? digit : t)
             .ToList();
 
         // Never normalise a title away completely ("Roman", "Nova"): fall back to the plain folded text.

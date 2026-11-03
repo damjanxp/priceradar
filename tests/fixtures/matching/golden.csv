@@ -1,0 +1,170 @@
+listing_title,listing_author,expected,kind
+Ivo Andrić - Na Drini ćuprija,,Ivo Andrić | Na Drini ćuprija,author_in_title
+На Дрини ћуприја,Иво Андрић,Ivo Andrić | Na Drini ćuprija,cyrillic
+Na Drini ćuprija,Andrić Ivo,Ivo Andrić | Na Drini ćuprija,swapped
+Prokleta avlija,Ivo Andric,Ivo Andrić | Prokleta avlija,ascii
+Prokleta avlija,Andrić Ivo,Ivo Andrić | Prokleta avlija,swapped
+Prokelta avlija,Ivo Andrić,Ivo Andrić | Prokleta avlija,typo
+Travnička hronika,,Ivo Andrić | Travnička hronika,no_author
+Travnička hronika,Ivo Andrić,Ivo Andrić | Travnička hronika,exact
+Travnička hronika,Andrić Ivo,Ivo Andrić | Travnička hronika,swapped
+Gospoiđca,Ivo Andrić,Ivo Andrić | Gospođica,typo
+Госпођица,Иво Андрић,Ivo Andrić | Gospođica,cyrillic
+Gospodjica,Ivo Andric,Ivo Andrić | Gospođica,ascii
+DERVIŠ I SMRT,MEŠA SELIMOVIĆ,Meša Selimović | Derviš i smrt,upper
+Derviš i smrt,M. Selimović,Meša Selimović | Derviš i smrt,initials
+Derviš i smrt,Selimović Meša,Meša Selimović | Derviš i smrt,swapped
+Tvrđava odlično očuvana,Meša Selimović,Meša Selimović | Tvrđava,noise
+Trvđava,Meša Selimović,Meša Selimović | Tvrđava,typo
+Tvrđava,M. Selimović,Meša Selimović | Tvrđava,initials
+Seobe,M. Crnjanski,Miloš Crnjanski | Seobe,initials
+Seobe,Crnjanski Miloš,Miloš Crnjanski | Seobe,swapped
+Seobe,Miloš Crnjanski,Miloš Crnjanski | Seobe,exact
+Seobe 2,M. Crnjanski,Miloš Crnjanski | Seobe 2,initials
+Seobe 2,Milos Crnjanski,Miloš Crnjanski | Seobe 2,ascii
+Seoeb 2,Miloš Crnjanski,Miloš Crnjanski | Seobe 2,typo
+Roman o Londonu,M. Crnjanski,Miloš Crnjanski | Roman o Londonu,initials
+"Roman o Londonu, 1977.",Miloš Crnjanski,Miloš Crnjanski | Roman o Londonu,noise
+Roman o Londonu,Crnjanski Miloš,Miloš Crnjanski | Roman o Londonu,swapped
+"Dnevnik o Čarnojeviću, 1977.",Miloš Crnjanski,Miloš Crnjanski | Dnevnik o Čarnojeviću,noise
+Дневник о Чарнојевићу,Милош Црњански,Miloš Crnjanski | Dnevnik o Čarnojeviću,cyrillic
+DNEVNIK O ČARNOJEVIĆU,MILOŠ CRNJANSKI,Miloš Crnjanski | Dnevnik o Čarnojeviću,upper
+Grobnica za Borisa Davidoviča,Kiš Danilo,Danilo Kiš | Grobnica za Borisa Davidoviča,swapped
+Grobnica za Borsia Davidoviča,Danilo Kiš,Danilo Kiš | Grobnica za Borisa Davidoviča,typo
+Grobnica za Borisa Davidoviča (tvrd povez),Danilo Kiš,Danilo Kiš | Grobnica za Borisa Davidoviča,noise
+"BAŠTA, PEPEO",DANILO KIŠ,"Danilo Kiš | Bašta, pepeo",upper
+"Bašta, pepeo",,"Danilo Kiš | Bašta, pepeo",no_author
+"Bašta, pepeo",Danilo Kiš,"Danilo Kiš | Bašta, pepeo",exact
+Enciklopedija rtvih,Danilo Kiš,Danilo Kiš | Enciklopedija mrtvih,typo
+Enciklopedija mrtvih,Danilo Kiš,Danilo Kiš | Enciklopedija mrtvih,exact
+Enciklopedija mrtvih,D. Kiš,Danilo Kiš | Enciklopedija mrtvih,initials
+PEŠČANIK,DANILO KIŠ,Danilo Kiš | Peščanik,upper
+Peščanik,D. Kiš,Danilo Kiš | Peščanik,initials
+Пешчаник,Данило Киш,Danilo Kiš | Peščanik,cyrillic
+Hazarski rečnik,,Milorad Pavić | Hazarski rečnik,no_author
+Hazarski rečnik,Milorad Pavić,Milorad Pavić | Hazarski rečnik,exact
+Hazarski recnik,Milorad Pavic,Milorad Pavić | Hazarski rečnik,ascii
+Predeo slikan cajem,Milorad Pavic,Milorad Pavić | Predeo slikan čajem,ascii
+Predeo slikan čajem,M. Pavić,Milorad Pavić | Predeo slikan čajem,initials
+Prede slikan čajem,Milorad Pavić,Milorad Pavić | Predeo slikan čajem,typo
+Кад су цветале тикве,Драгослав Михаиловић,Dragoslav Mihailović | Kad su cvetale tikve,cyrillic
+Kad su cvetlae tikve,Dragoslav Mihailović,Dragoslav Mihailović | Kad su cvetale tikve,typo
+Kad su cvetale tikve,Dragoslav Mihailović,Dragoslav Mihailović | Kad su cvetale tikve,exact
+Basta sljezove boje,Branko Copic,Branko Ćopić | Bašta sljezove boje,ascii
+Bašta sljezove boje NOVO,Branko Ćopić,Branko Ćopić | Bašta sljezove boje,noise
+Branko Ćopić - Bašta sljezove boje,,Branko Ćopić | Bašta sljezove boje,author_in_title
+ORLOVI RANO LETE,BRANKO ĆOPIĆ,Branko Ćopić | Orlovi rano lete,upper
+Orlovi rano lete,,Branko Ćopić | Orlovi rano lete,no_author
+Orlovi rano lete,Ćopić Branko,Branko Ćopić | Orlovi rano lete,swapped
+GORSKI VIJENAC,PETAR PETROVIĆ NJEGOŠ,Petar Petrović Njegoš | Gorski vijenac,upper
+Petar Petrović Njegoš - Gorski vijenac,,Petar Petrović Njegoš | Gorski vijenac,author_in_title
+Gorski vijenac,P. Petrović Njegoš,Petar Petrović Njegoš | Gorski vijenac,initials
+NEČISTA KRV,BORISAV STANKOVIĆ,Borisav Stanković | Nečista krv,upper
+Nečista krv,B. Stanković,Borisav Stanković | Nečista krv,initials
+Nečista krv,Borisav Stanković,Borisav Stanković | Nečista krv,exact
+Коштана,Борисав Станковић,Borisav Stanković | Koštana,cyrillic
+Koštana,Stanković Borisav,Borisav Stanković | Koštana,swapped
+Borisav Stanković - Koštana,,Borisav Stanković | Koštana,author_in_title
+Pop Ćira i pop Spira,,Stevan Sremac | Pop Ćira i pop Spira,no_author
+Pop Ćira i pop Spira,S. Sremac,Stevan Sremac | Pop Ćira i pop Spira,initials
+Поп Ћира и поп Спира,Стеван Сремац,Stevan Sremac | Pop Ćira i pop Spira,cyrillic
+Zona Zamfirova,Stevan Sremac,Stevan Sremac | Zona Zamfirova,exact
+Zona Zamfirova,,Stevan Sremac | Zona Zamfirova,no_author
+Zona Zamfirova,Stevan Sremac,Stevan Sremac | Zona Zamfirova,ascii
+Sumnjivo lice,,Branislav Nušić | Sumnjivo lice,no_author
+Branislav Nušić - Sumnjivo lice,,Branislav Nušić | Sumnjivo lice,author_in_title
+Sumnjivo lice 2. izdanje,Branislav Nušić,Branislav Nušić | Sumnjivo lice,noise
+Gosopđa ministarka,Branislav Nušić,Branislav Nušić | Gospođa ministarka,typo
+Gospođa ministarka,Nušić Branislav,Branislav Nušić | Gospođa ministarka,swapped
+Госпођа министарка,Бранислав Нушић,Branislav Nušić | Gospođa ministarka,cyrillic
+Аутобиографија,Бранислав Нушић,Branislav Nušić | Autobiografija,cyrillic
+Autobiografija,,Branislav Nušić | Autobiografija,no_author
+Autobiogrfaija,Branislav Nušić,Branislav Nušić | Autobiografija,typo
+Pesme,Desanka Maksimovic,Desanka Maksimović | Pesme,ascii
+Pese,Desanka Maksimović,Desanka Maksimović | Pesme,typo
+Pesme,Desanka Maksimović,Desanka Maksimović | Pesme,exact
+Pesme,,Branko Radičević | Pesme,no_author
+Pemse,Branko Radičević,Branko Radičević | Pesme,typo
+PESME,BRANKO RADIČEVIĆ,Branko Radičević | Pesme,upper
+"Kako upokojiti vampira, 1977.",Borislav Pekić,Borislav Pekić | Kako upokojiti vampira,noise
+Kako upokojiti vapira,Borislav Pekić,Borislav Pekić | Kako upokojiti vampira,typo
+KAKO UPOKOJITI VAMPIRA,BORISLAV PEKIĆ,Borislav Pekić | Kako upokojiti vampira,upper
+BESNILO,BORISLAV PEKIĆ,Borislav Pekić | Besnilo,upper
+Besnilo (tvrd povez),Borislav Pekić,Borislav Pekić | Besnilo,noise
+Besnilo,Borislav Pekic,Borislav Pekić | Besnilo,ascii
+Време чуда,Борислав Пекић,Borislav Pekić | Vreme čuda,cyrillic
+VREME ČUDA,BORISLAV PEKIĆ,Borislav Pekić | Vreme čuda,upper
+Vreme čuda,,Borislav Pekić | Vreme čuda,no_author
+Ranko Marinković - Kiklop,,Ranko Marinković | Kiklop,author_in_title
+Kiklop,Ranko Marinković,Ranko Marinković | Kiklop,exact
+Kiklop,,Ranko Marinković | Kiklop,no_author
+Zlocin i kazna,Fjodor Dostojevski,Fjodor Dostojevski | Zločin i kazna,ascii
+Zločin i kazna,,Fjodor Dostojevski | Zločin i kazna,no_author
+ZLOČIN I KAZNA,FJODOR DOSTOJEVSKI,Fjodor Dostojevski | Zločin i kazna,upper
+Braća Karamazovi NOVO,Fjodor Dostojevski,Fjodor Dostojevski | Braća Karamazovi,noise
+Braća Karamazovi,Dostojevski Fjodor,Fjodor Dostojevski | Braća Karamazovi,swapped
+Браћа Карамазови,Фјодор Достојевски,Fjodor Dostojevski | Braća Karamazovi,cyrillic
+Ana Karenjina,Tolstoj Lav,Lav Tolstoj | Ana Karenjina,swapped
+Ana Karenjina,Lav Tolstoj,Lav Tolstoj | Ana Karenjina,ascii
+Ana Karenjina - kao nova,Lav Tolstoj,Lav Tolstoj | Ana Karenjina,noise
+Majstor i Margarita,M. Bulgakov,Mihail Bulgakov | Majstor i Margarita,initials
+Majstor i Margarita,Mihail Bulgakov,Mihail Bulgakov | Majstor i Margarita,exact
+Mihail Bulgakov - Majstor i Margarita,,Mihail Bulgakov | Majstor i Margarita,author_in_title
+Sto godina samoce,Gabrijel Garsija Markes,Gabrijel Garsija Markes | Sto godina samoće,ascii
+Сто година самоће,Габријел Гарсија Маркес,Gabrijel Garsija Markes | Sto godina samoće,cyrillic
+Sto godina samoće (tvrd povez),Gabrijel Garsija Markes,Gabrijel Garsija Markes | Sto godina samoće,noise
+Мали принц,Антоан де Сент Егзипери,Antoan de Sent Egziperi | Mali princ,cyrillic
+Mali princ - kao nova,Antoan de Sent Egziperi,Antoan de Sent Egziperi | Mali princ,noise
+Antoan de Sent Egziperi - Mali princ,,Antoan de Sent Egziperi | Mali princ,author_in_title
+Alhemičar,P. Koeljo,Paulo Koeljo | Alhemičar,initials
+Alhemicar,Paulo Koeljo,Paulo Koeljo | Alhemičar,ascii
+Alhemičar,Koeljo Paulo,Paulo Koeljo | Alhemičar,swapped
+Ловац на змајеве,Халед Хосеини,Haled Hoseini | Lovac na zmajeve,cyrillic
+Lovac na zmajeve,Hoseini Haled,Haled Hoseini | Lovac na zmajeve,swapped
+Haled Hoseini - Lovac na zmajeve,,Haled Hoseini | Lovac na zmajeve,author_in_title
+Hiljadu čudesnih sunaca,Hoseini Haled,Haled Hoseini | Hiljadu čudesnih sunaca,swapped
+Hiljadu čudesnih unaca,Haled Hoseini,Haled Hoseini | Hiljadu čudesnih sunaca,typo
+Hiljadu čudesnih sunaca odlično očuvana,Haled Hoseini,Haled Hoseini | Hiljadu čudesnih sunaca,noise
+Ivo Andrić - Ex Ponto,,NEW,new:author_in_title
+Ćorkan i Švabica,Ivo Andrić,NEW,new:exact
+Lirika Itake,Miloš Crnjanski,NEW,new:exact
+Mansarda NOVO,Danilo Kiš,NEW,new:noise
+Rni jadi,Danilo Kiš,NEW,new:typo
+Unutrasnja strana vetra,Milorad Pavic,NEW,new:ascii
+Ostrvo,Selimović Meša,NEW,new:swapped
+HAJDUCI,BRANKO ĆOPIĆ,NEW,new:upper
+Ивкова слава,Стеван Сремац,NEW,new:cyrillic
+Protekcija,B. Nušić,NEW,new:initials
+Народни посланик,Бранислав Нушић,NEW,new:cyrillic
+Pokondirena tikva,Sterija Popović Jovan,NEW,new:swapped
+Кир Јања,Јован Стерија Поповић,NEW,new:cyrillic
+Rat i mir,Lav Tolstoj,NEW,new:exact
+IDIOT,FJODOR DOSTOJEVSKI,NEW,new:upper
+Fjodor Dostojevski - Bele noći,,NEW,new:author_in_title
+Porces,Franc Kafka,NEW,new:typo
+STRANAC,ALBER KAMI,NEW,new:upper
+Ljubav u doba kolere,Gabrijel Garsija Markes,NEW,new:ascii
+Zlatna knjig abajki,Desanka Maksimović,NEW,new:typo
+Pesme o ljubavi,V. Popa,NEW,new:initials
+SEOBE SRBA,DEJAN MEDAKOVIĆ,NEW,new:upper
+Travnička hronologija,P. Petrović,NEW,new:initials
+Grobnica za kraljeve - kao nova,Milan Kostić,NEW,new:noise
+Мајстор и ученик,Јован Јовановић,NEW,new:cyrillic
+Seobe 2,Miloš Crnjanski,Miloš Crnjanski | Seobe 2,trap:volume
+Seobe II,Milos Crnjanski,Miloš Crnjanski | Seobe 2,trap:roman-numeral-volume
+Seobe knjiga druga,Crnjanski,NEW,trap:volume-in-words
+Pesme,Branko Radičević,Branko Radičević | Pesme,trap:same-title
+PESME,DESANKA MAKSIMOVIC,Desanka Maksimović | Pesme,trap:same-title
+Pesme,,AMBIGUOUS,trap:same-title-no-author
+Na Drini cuprija,,Ivo Andrić | Na Drini ćuprija,trap:no-author
+Prokleta avlija - Ivo Andric - tvrd povez,,Ivo Andrić | Prokleta avlija,trap:double-dash
+Andric - Prokleta avlija,,Ivo Andrić | Prokleta avlija,trap:surname-only
+Zlocin i kazna,Dostojevski,Fjodor Dostojevski | Zločin i kazna,trap:surname-only-field
+Bracha Karamazovi,F. M. Dostojevski,Fjodor Dostojevski | Braća Karamazovi,trap:transliteration-typo
+Мајстор и Маргарита,Михаил Булгаков,Mihail Bulgakov | Majstor i Margarita,trap:cyrillic-foreign
+Mali princ,Antoine de Saint-Exupéry,Antoan de Sent Egziperi | Mali princ,trap:original-spelling
+Gospodja ministarka,Branislav Nusic,Branislav Nušić | Gospođa ministarka,trap:dj-spelling
+Tvrdjava,Mesa Selimovic,Meša Selimović | Tvrđava,trap:dj-spelling
+Idiot,Fjodor Mihajlovič Dostojevski,NEW,trap:new-same-author
+Hazarski rečnik - muški primerak,Milorad Pavić,Milorad Pavić | Hazarski rečnik,trap:edition-subtitle
+"Kad su cvetale tikve, roman",Dragoslav Mihailovic,Dragoslav Mihailović | Kad su cvetale tikve,trap:noise-word

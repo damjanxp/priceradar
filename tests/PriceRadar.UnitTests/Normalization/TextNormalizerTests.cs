@@ -27,6 +27,8 @@ public class TextNormalizerTests
     [InlineData("Knjiga za Marka", "knjiga za marka")]
     [InlineData("Roman", "roman")]
     [InlineData("1984", "1984")]
+    [InlineData("Seobe II", "seobe 2")]
+    [InlineData("Derviš i smrt", "dervis i smrt")]
     public void NormalizeTitle_MeaningfulWords_AreKept(string raw, string expected)
     {
         TextNormalizer.NormalizeTitle(raw).ShouldBe(expected);

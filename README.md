@@ -35,6 +35,25 @@ Running the Api outside Docker: `dotnet tool restore`, then `dotnet run --projec
 | `tools/PriceRadar.Seeder` | Synthetic data generator (DAY-2) |
 | `tests/*` | xUnit + Shouldly unit tests; Testcontainers integration tests from DAY-4 |
 
+## Matching quality
+
+Listings are matched to canonical books without ISBNs: Serbian-aware normalisation (Cyrillic → Latin, diacritics, noise words such as "kao nova", years, roman volume numerals), an inverted index for candidates, and a score of `0.7 · title + 0.3 · author` (FuzzySharp token ratios, Jaro-Winkler for names). Clear winners are matched automatically; the uncertain middle band goes to the Claude API, at most once per distinct string thanks to a database cache.
+
+Measured on a 169-listing golden set (`tests/fixtures/matching/`) with the chosen thresholds (auto 0.90, new book 0.65, margin 0.05):
+
+| Auto-match precision | Auto-match recall | Sent to Claude | Missed duplicates | Wrong auto-matches |
+|---|---|---|---|---|
+| 100.0 % | 88.7 % | 11.8 % | 0 | 0 |
+
+On the fixture data, fuzzy matching cut new-book creation for the first run from 52 to 21 books compared with exact matching. Run `dotnet test tests/PriceRadar.UnitTests --filter Category=Golden --logger "console;verbosity=detailed"` to print the full threshold grid.
+
+AI resolution is optional. Set a key for the Worker to enable it (it is never committed):
+
+```powershell
+dotnet user-secrets set "Ai:ApiKey" "<your Anthropic API key>" --project src/PriceRadar.Worker   # dotnet run
+# or ANTHROPIC_API_KEY=... in .env for docker compose
+```
+
 ## Scraping policy
 
 Live marketplace sources are disabled by default and intended for personal local use only. See spec §4.5.

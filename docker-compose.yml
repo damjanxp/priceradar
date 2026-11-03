@@ -57,6 +57,7 @@ services:
     environment:
       <<: *dotnet-env
       DOTNET_ENVIRONMENT: Development
+      Ai__ApiKey: ${ANTHROPIC_API_KEY:-}   # optional; without it ambiguous matches stay Pending (spec §6.6)
     volumes:
       - ./tests/fixtures/sources:/fixtures:ro
     depends_on:

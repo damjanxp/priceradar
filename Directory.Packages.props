@@ -7,6 +7,10 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.22" />
     <PackageVersion Include="Dapper" Version="2.1.86" />
   </ItemGroup>
+  <ItemGroup Label="Matching and AI">
+    <PackageVersion Include="FuzzySharp" Version="2.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.10.0" />
+  </ItemGroup>
   <ItemGroup Label="Background jobs">
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.24" />
     <PackageVersion Include="Hangfire.Core" Version="1.8.24" />

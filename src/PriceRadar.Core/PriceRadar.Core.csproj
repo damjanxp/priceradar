@@ -5,4 +5,9 @@
     <RootNamespace>PriceRadar.Core</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Pure string-similarity algorithms, allowed in Core (spec §4.4, D-14). -->
+    <PackageReference Include="FuzzySharp" />
+  </ItemGroup>
+
 </Project>
