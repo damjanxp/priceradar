@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.7 |
+| Version | 1.8 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.8 | 2026-11-03 | D. Petrov / Claude | DAY-6 results: covering index + empty columnstore for batch mode (D-40), measured before/after, parameter sniffing, Query Store, k6; four failure symptoms |
 | 1.7 | 2026-11-03 | D. Petrov / Claude | DAY-5 results: `disappearedInWindow` field, snake_case enum values, DAY-5 lookup matching (exact, then title-only), three EF/MVC failure symptoms |
 | 1.6 | 2026-10-29 | D. Petrov / Claude | DAY-4 results: measured baseline (4,736 reads, window-spool finding), benchmark runner script, AutomaticRetry note |
 | 1.5 | 2026-10-29 | D. Petrov / Claude | DAY-3 results: presence numbers corrected to 121/6 (rejected rows never reach the warehouse), new books created in `usp_ApplyMatchResults`, `ScrapeRun.FixtureSet`, full-wipe `--reset`, two startup failure modes |
@@ -343,7 +344,7 @@ Indexes: `UX_Listing_Source_External (SourceId, ExternalId)`; `IX_Listing_Book_S
 | PriceRsd | decimal(12,2) | no | Measure |
 | CapturedAtUtc | datetime2(3) | no | |
 
-Indexes: `UX_PriceSnapshot_Listing_Run (ListingId, ScrapeRunId)` — guarantees idempotent loads (FR-10). **Deliberately absent until DAY-6:** `IX_PriceSnapshot_Book_Date (BookId, DateKey) INCLUDE (ListingId, PriceRsd, CapturedAtUtc)`. Adding it is the measured "after" step of the benchmark (§11.4).
+Indexes: `UX_PriceSnapshot_Listing_Run (ListingId, ScrapeRunId)` — guarantees idempotent loads (FR-10). Added on DAY-6 after measuring (`docs/benchmarks/BENCHMARKS.md`): `IX_PriceSnapshot_Book_Date (BookId, DateKey) INCLUDE (ListingId, PriceRsd, CapturedAtUtc)` and the empty filtered columnstore `NCCI_PriceSnapshot_BatchMode` that enables batch mode (D-40).
 
 **`match.MatchCache`** — one row per distinct AI question.
 
@@ -415,7 +416,8 @@ END
 | Index | Query it serves | Why this shape |
 |---|---|---|
 | `UX_PriceSnapshot_Listing_Run` | Idempotent insert check | Uniqueness = correctness, not speed |
-| `IX_PriceSnapshot_Book_Date` (DAY-6) | Stats & history by book + date range | Equality column first, range column second; `INCLUDE` makes it covering (no key lookups) |
+| `IX_PriceSnapshot_Book_Date` (DAY-6) | Stats & history by book + date range | Equality column first, range column second; `INCLUDE` makes it covering (no key lookups). Measured: 4,736 → 3–51 reads |
+| `NCCI_PriceSnapshot_BatchMode` (DAY-6) | Same queries | Holds no rows (contradictory filter); its existence lets the window aggregates run in batch mode without a worktable. Q3: 50,742 → 56 reads |
 | `IX_Listing_Book_Status` | Supply counts, listing page | Filters on BookId, groups by Status |
 | `IX_Listing_Scope_Status` | Presence update per scope | Avoids scanning all listings per run |
 | `UX_ScrapeRun_ActivePerSource` | One active run per source | Filtered unique index = race-free guard |
@@ -1214,8 +1216,12 @@ ORDER BY rs.avg_duration DESC;
 ```
 
 ```powershell
-Get-Content perf/lookup.js | docker run --rm -i -e BASE_URL=http://host.docker.internal:5080 grafana/k6 run -
-# expected summary line: http_req_duration … p(95)=xx.xxms   checks… 100.00%
+$env:PRICERADAR_LOOKUP_PER_MINUTE = 100000; docker compose up -d api      # lift the rate limit for the load test
+docker run --rm -i -v "${PWD}/perf:/perf" -e BASE_URL=http://host.docker.internal:5080 grafana/k6:0.57.0 run --summary-export=/perf/k6-after.json /perf/lookup.js
+# measured: before p(95)=145.93ms (101 req/s) → after p(95)=18.47ms (838 req/s), checks 100.00%
+Remove-Item Env:PRICERADAR_LOOKUP_PER_MINUTE; docker compose up -d api   # back to 60/min
+python db/benchmarks/run_benchmarks.py after-index        # medians + .sqlplan files
+python db/benchmarks/experiments.py sniffing              # also: columnstore, columnstore-empty, querystore
 ```
 
 **Evidence:** before/after plan screenshots side by side; `STATISTICS IO` text for both; the k6 summary before and after; the filled table.
@@ -1226,6 +1232,10 @@ Get-Content perf/lookup.js | docker run --rm -i -e BASE_URL=http://host.docker.i
 - Elapsed time is noisy → the laptop is in power-saving mode or other containers are running; use medians and note the conditions.
 - k6 cannot connect → inside Docker `localhost` is the k6 container; use `host.docker.internal`.
 - k6 sees 429s → the rate limiter is not raised for the benchmark run.
+- `CREATE COLUMNSTORE INDEX` hangs on wait type `RESOURCE_SEMAPHORE` → its memory grant (150 MB here) exceeds the semaphore target (128 MB in a squeezed 2 GB container; check `sys.dm_exec_query_memory_grants` and `sys.dm_exec_query_resource_semaphores`). `MAXDOP 1` did not help; restarting SQL Server / giving it more memory did.
+- A sniffing test shows each parameter with its own estimate → the test recompiled the plan; verify reuse via `sys.dm_exec_query_stats.execution_count` and the cached plan's `EstimateRows`.
+- Query Store already has history before you enable it → SQL Server 2022 enables it by default for new databases; good: it records the before/after plans.
+- `sqlcmd` rejects `-y 0` together with `-h` or `-W` → they are mutually exclusive; build data files through the API instead.
 
 **Cut-if-late:** The columnstore experiment and Query Store. **Never cut** the baseline vs covering-index comparison and the k6 run.
 
@@ -1495,6 +1505,7 @@ Final smoke checklist: `/health/ready` Healthy · one fixture run Succeeded · l
 | D-36 | **Offset pagination** (`page`/`pageSize`, max 100) | Keyset/cursor | Small result sets; simpler clients | Deep pages are slower (S-6) |
 | D-37 | Live scraping limited to **Kupindo**, optional and off by default, **category pages only** (robots.txt disallows search, pagination links, price sorting and sold pages) | Live scrapers for both sites; search-based Kupindo runs | One live source shows the pattern; robots.txt and ToS are respected literally | No ad-hoc title search on live data; coverage limited to the page cap |
 | D-38 | Phone access via **home Wi-Fi or a dev tunnel** for the MVP; public hosting = Azure Stretch (S-1) | Deploy to Azure in the MVP | Keeps the 10 days on backend work; a tunnel is enough for a demo GIF | Not usable at the market without a tunnel or S-1 |
+| D-40 | **Empty filtered nonclustered columnstore index** on `dw.PriceSnapshot` to enable batch mode | Full NCCI on the query columns; rewriting the percentiles without window functions; `OPTION (RECOMPILE)` | Measured: same batch-mode gain as the full NCCI (Q3 50,742 → 56 reads, 41 → 10 ms) with a 29 ms build and no insert overhead (full NCCI: +29 % insert time) | Relies on an optimiser behaviour that is well known but not a documented contract; re-measure after SQL Server upgrades |
 | D-39 | **KupujemProdajem as a synthetic fixture source** (`kp`): invented ads in KP's format; no KP scraper, no copied KP ads | A disabled KP scraper; hand-copied KP ads as fixtures | KP ToS §11 forbids manual and automated copying/scraping; a ToS-violating scraper in a public CV repo is a liability | KP data is not real; a live KP source needs written permission or an official API |
 
 ## Appendix A — README outline

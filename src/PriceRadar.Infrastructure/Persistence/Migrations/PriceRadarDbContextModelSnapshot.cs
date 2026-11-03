@@ -333,6 +333,11 @@ namespace PriceRadar.Infrastructure.Persistence.Migrations
 
                     SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PriceSnapshotId"));
 
+                    b.HasIndex("BookId", "DateKey")
+                        .HasDatabaseName("IX_PriceSnapshot_Book_Date");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("BookId", "DateKey"), new[] { "ListingId", "PriceRsd", "CapturedAtUtc" });
+
                     b.HasIndex("ListingId", "ScrapeRunId")
                         .IsUnique()
                         .HasDatabaseName("UX_PriceSnapshot_Listing_Run");

@@ -1,0 +1,192 @@
+{
+  "label": "baseline-day6",
+  "takenAtUtc": "2026-11-03T19:57:35+00:00",
+  "sqlServer": "16.0.4305.5",
+  "runsPerQuery": 5,
+  "results": [
+    {
+      "id": "Q1",
+      "name": "Stats, hot book (8,275 snapshots)",
+      "sql": "EXEC dw.usp_GetBookStats @BookId = 6442, @WindowDays = 30, @AsOfUtc = '2026-10-28T12:00:00';",
+      "label": "baseline-day6",
+      "median": {
+        "snapshotReads": 4736,
+        "totalReads": 6809,
+        "cpuMs": 74,
+        "elapsedMs": 21
+      },
+      "samples": [
+        {
+          "snapshotReads": 4736,
+          "totalReads": 6809,
+          "cpuMs": 82,
+          "elapsedMs": 16
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 6809,
+          "cpuMs": 81,
+          "elapsedMs": 24
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 6809,
+          "cpuMs": 69,
+          "elapsedMs": 21
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 6809,
+          "cpuMs": 74,
+          "elapsedMs": 27
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 6809,
+          "cpuMs": 58,
+          "elapsedMs": 17
+        }
+      ],
+      "plan": "Clustered Index Scan PriceSnapshot.PK_PriceSnapshot",
+      "planFile": "docs/benchmarks/plans/q1-baseline-day6.sqlplan"
+    },
+    {
+      "id": "Q2",
+      "name": "Stats, median book (14 snapshots)",
+      "sql": "EXEC dw.usp_GetBookStats @BookId = 13212, @WindowDays = 30, @AsOfUtc = '2026-10-28T12:00:00';",
+      "label": "baseline-day6",
+      "median": {
+        "snapshotReads": 4492,
+        "totalReads": 4495,
+        "cpuMs": 35,
+        "elapsedMs": 37
+      },
+      "samples": [
+        {
+          "snapshotReads": 4492,
+          "totalReads": 4495,
+          "cpuMs": 44,
+          "elapsedMs": 44
+        },
+        {
+          "snapshotReads": 4492,
+          "totalReads": 4495,
+          "cpuMs": 37,
+          "elapsedMs": 37
+        },
+        {
+          "snapshotReads": 4492,
+          "totalReads": 4495,
+          "cpuMs": 35,
+          "elapsedMs": 37
+        },
+        {
+          "snapshotReads": 4492,
+          "totalReads": 4495,
+          "cpuMs": 35,
+          "elapsedMs": 36
+        },
+        {
+          "snapshotReads": 4492,
+          "totalReads": 4495,
+          "cpuMs": 32,
+          "elapsedMs": 33
+        }
+      ],
+      "plan": "Clustered Index Scan PriceSnapshot.PK_PriceSnapshot (warnings: MemoryGrantWarning)",
+      "planFile": "docs/benchmarks/plans/q2-baseline-day6.sqlplan"
+    },
+    {
+      "id": "Q3",
+      "name": "Price history, hot book, 180 days by week",
+      "sql": "EXEC dw.usp_GetPriceHistory @BookId = 6442, @FromDateKey = 20260501, @ToDateKey = 20261028, @Bucket = 'week';",
+      "label": "baseline-day6",
+      "median": {
+        "snapshotReads": 4736,
+        "totalReads": 55457,
+        "cpuMs": 163,
+        "elapsedMs": 40
+      },
+      "samples": [
+        {
+          "snapshotReads": 4736,
+          "totalReads": 55457,
+          "cpuMs": 173,
+          "elapsedMs": 40
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 55457,
+          "cpuMs": 168,
+          "elapsedMs": 43
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 55457,
+          "cpuMs": 142,
+          "elapsedMs": 35
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 55457,
+          "cpuMs": 163,
+          "elapsedMs": 41
+        },
+        {
+          "snapshotReads": 4736,
+          "totalReads": 55457,
+          "cpuMs": 139,
+          "elapsedMs": 32
+        }
+      ],
+      "plan": "Clustered Index Scan PriceSnapshot.PK_PriceSnapshot",
+      "planFile": "docs/benchmarks/plans/q3-baseline-day6.sqlplan"
+    },
+    {
+      "id": "Q4",
+      "name": "Lookup exact-key search",
+      "sql": "SELECT BookId FROM dw.Book WHERE NormKey = 'andric ivo|na drini cuprija';",
+      "label": "baseline-day6",
+      "median": {
+        "snapshotReads": 0,
+        "totalReads": 3,
+        "cpuMs": 0,
+        "elapsedMs": 0
+      },
+      "samples": [
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        }
+      ],
+      "plan": "Index Seek Book.UX_Book_NormKey",
+      "planFile": "docs/benchmarks/plans/q4-baseline-day6.sqlplan"
+    }
+  ]
+}

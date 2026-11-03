@@ -1,0 +1,63 @@
+{
+  "insert10kMs_rowstoreOnly": 95,
+  "buildMs": 2517,
+  "insert10kMs_withColumnstore": 123,
+  "Q1": {
+    "snapshotReads": 17,
+    "totalReads": 52,
+    "cpuMs": 1,
+    "elapsedMs": 3,
+    "grantedKb": 3072,
+    "usedKb": 2088,
+    "spills": 0,
+    "batchModeOps": [
+      "Compute Scalar",
+      "Filter",
+      "Index Seek",
+      "Sort",
+      "Window Aggregate"
+    ],
+    "estimatedRows": 2940.52,
+    "actualRows": 1405,
+    "op": "Index Seek"
+  },
+  "Q2": {
+    "snapshotReads": 3,
+    "totalReads": 6,
+    "cpuMs": 0,
+    "elapsedMs": 1,
+    "grantedKb": 2920,
+    "usedKb": 1488,
+    "spills": 0,
+    "batchModeOps": [
+      "Compute Scalar",
+      "Filter",
+      "Index Seek",
+      "Sort",
+      "Window Aggregate"
+    ],
+    "estimatedRows": 9.47432,
+    "actualRows": 0,
+    "op": "Index Seek"
+  },
+  "Q3": {
+    "snapshotReads": 56,
+    "totalReads": 59,
+    "cpuMs": 9,
+    "elapsedMs": 11,
+    "grantedKb": 4608,
+    "usedKb": 2664,
+    "spills": 0,
+    "batchModeOps": [
+      "Adaptive Join",
+      "Clustered Index Seek",
+      "Compute Scalar",
+      "Index Seek",
+      "Sort",
+      "Window Aggregate"
+    ],
+    "estimatedRows": 8428.79,
+    "actualRows": 8275,
+    "op": "Index Seek"
+  }
+}

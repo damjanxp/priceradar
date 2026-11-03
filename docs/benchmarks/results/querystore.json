@@ -1,0 +1,7 @@
+{
+  "topQueries": [
+    "usp_GetBookStats | (@BookId int,@fromKey int,@toKey int,@from datetime2(3),@now datetime2 | execs=56466 | avg_ms=12.49 | avg_reads=629 | plans=5",
+    "usp_GetBookStats | (@BookId int,@from datetime2(3),@now datetime2(3))SELECT COALESCE(SUM( | execs=56466 | avg_ms=0.25 | avg_reads=20 | plans=1",
+    "usp_GetPriceHistory | (@BookId int,@FromDateKey int,@ToDateKey int,@Bucket varchar(4))WITH s | execs=44 | avg_ms=25.02 | avg_reads=28050 | plans=4"
+  ]
+}

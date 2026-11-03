@@ -38,6 +38,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development   # local stack: Scalar UI and an open Hangfire dashboard
       Database__ApplyMigrationsOnStartup: "true"
       Security__ApiKey: ${PRICERADAR_API_KEY:-dev-key}   # local default; override in .env
+      RateLimiting__LookupPerMinute: ${PRICERADAR_LOOKUP_PER_MINUTE:-60}   # k6 runs set 100000 (spec §11.5)
     ports:
       - "5080:8080"
     volumes:

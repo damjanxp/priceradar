@@ -1,0 +1,32 @@
+{
+  "output": [
+    "small book: 2",
+    "3 0",
+    "SQL Server parse and compile time:",
+    "   CPU time = 0 ms, elapsed time = 0 ms.",
+    " SQL Server Execution Times:",
+    "   CPU time = 0 ms,  elapsed time = 0 ms.",
+    " SQL Server Execution Times:",
+    "   CPU time = 0 ms,  elapsed time = 0 ms.",
+    " SQL Server Execution Times:",
+    "   CPU time = 0 ms,  elapsed time = 0 ms.",
+    " SQL Server Execution Times:",
+    "   CPU time = 0 ms,  elapsed time = 0 ms.",
+    " SQL Server Execution Times:",
+    "   CPU time = 0 ms,  elapsed time = 0 ms.",
+    "197 220.00 800.00 410.00 490.00 570.00",
+    " SQL Server Execution Times:",
+    "   CPU time = 3 ms,  elapsed time = 5 ms.",
+    "44 167",
+    " SQL Server Execution Times:",
+    "   CPU time = 4 ms,  elapsed time = 1 ms.",
+    " SQL Server Execution Times:",
+    "   CPU time = 7 ms,  elapsed time = 6 ms.",
+    "--- cached plan after small-then-hot",
+    "2 2560 2088 0 14 5.390000 12.504300000000001",
+    "197 220.00 800.00 410.00 490.00 570.00",
+    "44 167",
+    "--- hot book with its own plan",
+    "1 2560 2088 0 14 3.566000"
+  ]
+}

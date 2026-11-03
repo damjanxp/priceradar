@@ -1,0 +1,192 @@
+{
+  "label": "after-index",
+  "takenAtUtc": "2026-11-03T20:01:19+00:00",
+  "sqlServer": "16.0.4305.5",
+  "runsPerQuery": 5,
+  "results": [
+    {
+      "id": "Q1",
+      "name": "Stats, hot book (8,275 snapshots)",
+      "sql": "EXEC dw.usp_GetBookStats @BookId = 6442, @WindowDays = 30, @AsOfUtc = '2026-10-28T12:00:00';",
+      "label": "after-index",
+      "median": {
+        "snapshotReads": 12,
+        "totalReads": 2085,
+        "cpuMs": 9,
+        "elapsedMs": 10
+      },
+      "samples": [
+        {
+          "snapshotReads": 12,
+          "totalReads": 2085,
+          "cpuMs": 8,
+          "elapsedMs": 11
+        },
+        {
+          "snapshotReads": 12,
+          "totalReads": 2085,
+          "cpuMs": 10,
+          "elapsedMs": 9
+        },
+        {
+          "snapshotReads": 12,
+          "totalReads": 2085,
+          "cpuMs": 8,
+          "elapsedMs": 9
+        },
+        {
+          "snapshotReads": 12,
+          "totalReads": 2085,
+          "cpuMs": 9,
+          "elapsedMs": 10
+        },
+        {
+          "snapshotReads": 12,
+          "totalReads": 2085,
+          "cpuMs": 10,
+          "elapsedMs": 13
+        }
+      ],
+      "plan": "Index Seek PriceSnapshot.IX_PriceSnapshot_Book_Date",
+      "planFile": "docs/benchmarks/plans/q1-after-index.sqlplan"
+    },
+    {
+      "id": "Q2",
+      "name": "Stats, median book (14 snapshots)",
+      "sql": "EXEC dw.usp_GetBookStats @BookId = 13212, @WindowDays = 30, @AsOfUtc = '2026-10-28T12:00:00';",
+      "label": "after-index",
+      "median": {
+        "snapshotReads": 3,
+        "totalReads": 6,
+        "cpuMs": 5,
+        "elapsedMs": 6
+      },
+      "samples": [
+        {
+          "snapshotReads": 3,
+          "totalReads": 6,
+          "cpuMs": 8,
+          "elapsedMs": 8
+        },
+        {
+          "snapshotReads": 3,
+          "totalReads": 6,
+          "cpuMs": 5,
+          "elapsedMs": 6
+        },
+        {
+          "snapshotReads": 3,
+          "totalReads": 6,
+          "cpuMs": 4,
+          "elapsedMs": 6
+        },
+        {
+          "snapshotReads": 3,
+          "totalReads": 6,
+          "cpuMs": 5,
+          "elapsedMs": 6
+        },
+        {
+          "snapshotReads": 3,
+          "totalReads": 6,
+          "cpuMs": 7,
+          "elapsedMs": 7
+        }
+      ],
+      "plan": "Index Seek PriceSnapshot.IX_PriceSnapshot_Book_Date",
+      "planFile": "docs/benchmarks/plans/q2-after-index.sqlplan"
+    },
+    {
+      "id": "Q3",
+      "name": "Price history, hot book, 180 days by week",
+      "sql": "EXEC dw.usp_GetPriceHistory @BookId = 6442, @FromDateKey = 20260501, @ToDateKey = 20261028, @Bucket = 'week';",
+      "label": "after-index",
+      "median": {
+        "snapshotReads": 51,
+        "totalReads": 50742,
+        "cpuMs": 40,
+        "elapsedMs": 41
+      },
+      "samples": [
+        {
+          "snapshotReads": 51,
+          "totalReads": 50742,
+          "cpuMs": 32,
+          "elapsedMs": 40
+        },
+        {
+          "snapshotReads": 51,
+          "totalReads": 50742,
+          "cpuMs": 41,
+          "elapsedMs": 42
+        },
+        {
+          "snapshotReads": 51,
+          "totalReads": 50742,
+          "cpuMs": 39,
+          "elapsedMs": 40
+        },
+        {
+          "snapshotReads": 51,
+          "totalReads": 50742,
+          "cpuMs": 41,
+          "elapsedMs": 43
+        },
+        {
+          "snapshotReads": 51,
+          "totalReads": 50742,
+          "cpuMs": 40,
+          "elapsedMs": 41
+        }
+      ],
+      "plan": "Index Seek PriceSnapshot.IX_PriceSnapshot_Book_Date",
+      "planFile": "docs/benchmarks/plans/q3-after-index.sqlplan"
+    },
+    {
+      "id": "Q4",
+      "name": "Lookup exact-key search",
+      "sql": "SELECT BookId FROM dw.Book WHERE NormKey = 'andric ivo|na drini cuprija';",
+      "label": "after-index",
+      "median": {
+        "snapshotReads": 0,
+        "totalReads": 3,
+        "cpuMs": 0,
+        "elapsedMs": 0
+      },
+      "samples": [
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        },
+        {
+          "snapshotReads": 0,
+          "totalReads": 3,
+          "cpuMs": 0,
+          "elapsedMs": 0
+        }
+      ],
+      "plan": "Index Seek Book.UX_Book_NormKey",
+      "planFile": "docs/benchmarks/plans/q4-after-index.sqlplan"
+    }
+  ]
+}

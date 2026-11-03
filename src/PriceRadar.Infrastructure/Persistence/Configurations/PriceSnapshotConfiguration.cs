@@ -24,6 +24,10 @@ internal sealed class PriceSnapshotConfiguration : IEntityTypeConfiguration<Pric
         // FR-10: at most one snapshot per listing per run.
         builder.HasIndex(x => new { x.ListingId, x.ScrapeRunId }).IsUnique().HasDatabaseName("UX_PriceSnapshot_Listing_Run");
 
-        // IX_PriceSnapshot_Book_Date is deliberately absent until DAY-6: it is the measured "after" step.
+        // DAY-6 (BENCHMARKS.md): equality column first, range column second; INCLUDE makes it covering for the stats
+        // and history procedures, so they seek instead of scanning the whole table.
+        builder.HasIndex(x => new { x.BookId, x.DateKey })
+            .IncludeProperties(x => new { x.ListingId, x.PriceRsd, x.CapturedAtUtc })
+            .HasDatabaseName("IX_PriceSnapshot_Book_Date");
     }
 }

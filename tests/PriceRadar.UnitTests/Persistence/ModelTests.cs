@@ -42,13 +42,15 @@ public class ModelTests
     }
 
     [Fact]
-    public void PriceSnapshot_HasNoBookIndexBeforeDay6()
+    public void PriceSnapshot_HasExactlyTheBenchmarkedIndexes()
     {
-        // The DAY-6 benchmark measures adding IX_PriceSnapshot_Book_Date; nothing may pre-empt it.
-        var indexes = Model.FindEntityType(typeof(PriceSnapshot))!.GetIndexes();
+        // Measured on DAY-6 (BENCHMARKS.md). Any other index must be justified by a measurement first.
+        var indexes = Model.FindEntityType(typeof(PriceSnapshot))!.GetIndexes().ToList();
 
-        indexes.ShouldNotContain(i => i.Properties[0].Name == nameof(PriceSnapshot.BookId));
-        indexes.Select(i => i.GetDatabaseName()).ShouldBe(["UX_PriceSnapshot_Listing_Run"]);
+        indexes.Select(i => i.GetDatabaseName()).Order().ShouldBe(["IX_PriceSnapshot_Book_Date", "UX_PriceSnapshot_Listing_Run"]);
+        var covering = indexes.Single(i => i.GetDatabaseName() == "IX_PriceSnapshot_Book_Date");
+        covering.Properties.Select(p => p.Name).ShouldBe([nameof(PriceSnapshot.BookId), nameof(PriceSnapshot.DateKey)]);
+        covering.GetIncludeProperties()!.ShouldBe([nameof(PriceSnapshot.ListingId), nameof(PriceSnapshot.PriceRsd), nameof(PriceSnapshot.CapturedAtUtc)]);
     }
 
     [Fact]
