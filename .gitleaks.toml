@@ -1,0 +1,16 @@
+# gitleaks configuration (spec NFR-7). Default rules, plus an allow-list for the documented local placeholders.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Documented local-only placeholders, never real secrets"
+regexes = [
+  '''ChangeMe_Local_123!''',
+  '''dev-key''',
+  '''test-key''',
+  '''sk-ant-\.\.\.''',
+]
+paths = [
+  '''docs/spec/PriceRadar-Spec\.pdf''',
+  '''docs/benchmarks/plans/.*\.sqlplan''',
+]

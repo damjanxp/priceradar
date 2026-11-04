@@ -8,6 +8,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PriceRadar.Core\PriceRadar.Core.csproj" />
     <ProjectReference Include="..\..\src\PriceRadar.Infrastructure\PriceRadar.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\PriceRadar.Api\PriceRadar.Api.csproj" />
+    <ProjectReference Include="..\..\src\PriceRadar.Worker\PriceRadar.Worker.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +17,7 @@
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
     <PackageReference Include="Shouldly" />
+    <PackageReference Include="NetArchTest.Rules" />
     <PackageReference Include="coverlet.collector" PrivateAssets="all" />
   </ItemGroup>
 

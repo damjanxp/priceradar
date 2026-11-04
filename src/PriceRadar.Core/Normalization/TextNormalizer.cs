@@ -30,7 +30,13 @@ public static partial class TextNormalizer
     // are words ("and", "in"), and "x" is too ambiguous.
     private static readonly Dictionary<string, string> RomanVolumes = new(StringComparer.Ordinal)
     {
-        ["ii"] = "2", ["iii"] = "3", ["iv"] = "4", ["vi"] = "6", ["vii"] = "7", ["viii"] = "8", ["ix"] = "9",
+        ["ii"] = "2",
+        ["iii"] = "3",
+        ["iv"] = "4",
+        ["vi"] = "6",
+        ["vii"] = "7",
+        ["viii"] = "8",
+        ["ix"] = "9",
     };
 
     /// <summary>N1–N7 for a title: fold to ASCII, drop noise phrases and 4-digit years, keep other numbers.</summary>

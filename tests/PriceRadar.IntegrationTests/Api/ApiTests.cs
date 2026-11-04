@@ -212,6 +212,19 @@ public sealed class ApiTests(MsSqlFixture sql) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Responses_EchoCorrelationId_AndProblemTraceIdMatchesIt()
+    {
+        var mine = new HttpRequestMessage(HttpMethod.Get, "/health");
+        mine.Headers.Add("X-Correlation-Id", "market-stall-42");
+        (await _client.SendAsync(mine)).Headers.GetValues("X-Correlation-Id").Single().ShouldBe("market-stall-42");
+
+        // Without one, the id is the W3C trace id, which is also inside the ProblemDetails traceId.
+        var problem = await _client.GetAsync("/api/books/99999999");
+        var correlation = problem.Headers.GetValues("X-Correlation-Id").Single();
+        (await JsonAsync(problem)).GetProperty("traceId").GetString()!.ShouldContain(correlation);
+    }
+
+    [Fact]
     public async Task Responses_CarrySecurityHeaders()
     {
         var response = await _client.GetAsync("/health");

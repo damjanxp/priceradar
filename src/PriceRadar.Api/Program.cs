@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using PriceRadar.Api.Health;
 using PriceRadar.Api.Problems;
 using PriceRadar.Api.Security;
-using PriceRadar.Api.Health;
 using PriceRadar.Infrastructure;
 using PriceRadar.Infrastructure.Persistence;
 using Scalar.AspNetCore;
@@ -48,6 +48,7 @@ try
         await app.Services.MigrateDatabaseAsync(app.Logger);
     }
 
+    app.UseCorrelationId();
     app.UseSerilogRequestLogging();
     app.UseSecurityHeaders();
     app.UseExceptionHandler();

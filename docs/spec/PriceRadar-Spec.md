@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.9 |
+| Version | 1.10 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.10 | 2026-11-04 | D. Petrov / Claude | DAY-8 results: architecture tests, three-job CI with gitleaks and coverage summary, correlation id, measured coverage, debugging log; two failure symptoms |
 | 1.9 | 2026-11-03 | D. Petrov / Claude | DAY-7 results: golden-set metrics and grid, same-author candidate fallback, roman volume numerals (N7b), document-frequency stop rule, cached Error answers, lookup methods, two failure symptoms |
 | 1.8 | 2026-11-03 | D. Petrov / Claude | DAY-6 results: covering index + empty columnstore for batch mode (D-40), measured before/after, parameter sniffing, Query Store, k6; four failure symptoms |
 | 1.7 | 2026-11-03 | D. Petrov / Claude | DAY-5 results: `disappearedInWindow` field, snake_case enum values, DAY-5 lookup matching (exact, then title-only), three EF/MVC failure symptoms |
@@ -1324,7 +1325,9 @@ SELECT MatchStatus, COUNT(*) FROM dw.Listing GROUP BY MatchStatus;              
 - [ ] Production-debugging drill: break something on purpose (wrong column length), diagnose from logs + Hangfire, fix, write it up (1 h)
 - [ ] Dockerfiles hardened (non-root, healthcheck) (1 h)
 
-**Deliverables:** `.github/workflows/ci.yml` (full), `ArchitectureTests.cs`, coverage report artifact, `docs/evidence/day08-ci.png`, `docs/debugging-drill.md`.
+**Deliverables:** `.github/workflows/ci.yml` (full), `ArchitectureTests.cs`, coverage report artifact, `docs/evidence/day08-ci.png`, `docs/debugging.md` (six real incidents instead of one staged drill).
+
+**Measured result (2026-11-04).** 186 unit + 35 integration tests green in Release. Line coverage over all tests 94.7 % (branch 76.9 %): Core 87.3 %, Infrastructure 97.1 %, Api 79.6 %, Worker 0 % (host wiring only; its jobs live in Infrastructure). Core from unit tests alone: 80.5 %. Every job log line carries `RunId` and `Job` through `BeginScope`; every request carries `CorrelationId` (echoed in `X-Correlation-Id`, equal to the ProblemDetails `traceId` when the client sends none).
 
 **Design decisions today:** D-26, D-27, D-28, D-35.
 
@@ -1357,6 +1360,8 @@ Push a branch and open a PR: the 3 jobs (`lint`, `build-test`, `docker`) run, an
 - `dotnet format` fails only in CI → line-ending differences; add `.gitattributes` (`* text=auto eol=lf`).
 - gitleaks flags `.env.example` → use obvious placeholders (`ChangeMe_123!`) or an allow-list entry.
 - Flaky integration tests → shared state between tests; Respawn reset + `[Collection]` serialisation.
+- `dotnet format` reports hundreds of ENDOFLINE errors on Windows → `.editorconfig` says `end_of_line = lf` while the checkout has CRLF; let `.gitattributes` own line endings and drop the editorconfig rule.
+- IDE1006 on every `static readonly` field → the `_camelCase` private-field rule also matches statics; add PascalCase rules for static and const fields *before* it.
 
 **Cut-if-late:** Seq profile and the docker job's cache tuning. **Never cut** CI with integration tests.
 
