@@ -54,6 +54,8 @@ try
     app.UseExceptionHandler();
     app.UseStatusCodePages();
     app.UseRateLimiter();
+    app.UseDefaultFiles();   // GET / serves wwwroot/index.html, the mobile lookup page (FR-16)
+    app.UseStaticFiles();
 
     if (app.Environment.IsDevelopment())
     {

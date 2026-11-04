@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1d4e89">
+  <meta name="description" content="Is this used book's price cheap, fair or expensive? Compares an asking price with listings on Serbian marketplaces.">
+  <title>PriceRadar — used-book price check</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>PriceRadar</h1>
+      <p class="tagline">Is the price at this stall a good deal? <span lang="sr">Da li je cena dobra?</span></p>
+    </header>
+
+    <form id="lookup" novalidate>
+      <label for="title">Title <span class="hint">Latin or Cyrillic, typos are fine</span></label>
+      <input id="title" name="title" type="text" required minlength="2" maxlength="300" autocomplete="off"
+             autocapitalize="sentences" placeholder="Na Drini ćuprija">
+
+      <label for="author">Author <span class="hint">optional, but makes the match surer</span></label>
+      <input id="author" name="author" type="text" maxlength="200" autocomplete="off" placeholder="Ivo Andrić">
+
+      <label for="price">Asking price (RSD)</label>
+      <input id="price" name="askingPrice" type="text" inputmode="numeric" pattern="[0-9]*" required placeholder="400">
+
+      <button id="submit" type="submit">Check price</button>
+      <p id="form-error" class="form-error" role="alert" hidden></p>
+    </form>
+
+    <section id="result" aria-live="polite" hidden></section>
+
+    <details class="recent" id="recent-box" hidden>
+      <summary>Recent checks</summary>
+      <ul id="recent"></ul>
+    </details>
+
+    <footer>
+      Compares your price with listings seen in the last 30 days. "Disappeared" is a sold proxy, not confirmed sales.
+      <a href="/scalar">API</a>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -56,7 +56,9 @@ public sealed class LookupService(
         if (match.Status != LookupMatchStatus.Matched)
         {
             var explanation = match.Status == LookupMatchStatus.Ambiguous
-                ? $"{match.Candidates.Count} books could match; pick one to see its price statistics."
+                ? match.Candidates.Count == 1
+                    ? "One book could match; confirm it to see its price statistics."
+                    : $"{match.Candidates.Count} books could match; pick one to see its price statistics."
                 : "No book in the catalogue matches this title and author.";
             return new LookupResult(echo, match, match.Status == LookupMatchStatus.NoMatch ? Verdict.Unknown : null, null, null,
                 explanation, sw.ElapsedMilliseconds);

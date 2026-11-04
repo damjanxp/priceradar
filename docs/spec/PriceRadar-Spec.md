@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.10 |
+| Version | 1.11 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.11 | 2026-11-04 | D. Petrov / Claude | DAY-9 results: lookup page, measured Lighthouse score, single-candidate wording, README and AI-usage log; two failure symptoms |
 | 1.10 | 2026-11-04 | D. Petrov / Claude | DAY-8 results: architecture tests, three-job CI with gitleaks and coverage summary, correlation id, measured coverage, debugging log; two failure symptoms |
 | 1.9 | 2026-11-03 | D. Petrov / Claude | DAY-7 results: golden-set metrics and grid, same-author candidate fallback, roman volume numerals (N7b), document-frequency stop rule, cached Error answers, lookup methods, two failure symptoms |
 | 1.8 | 2026-11-03 | D. Petrov / Claude | DAY-6 results: covering index + empty columnstore for batch mode (D-40), measured before/after, parameter sniffing, Query Store, k6; four failure symptoms |
@@ -1381,6 +1382,8 @@ Push a branch and open a PR: the 3 jobs (`lint`, `build-test`, `docker`) run, an
 
 **Deliverables:** `src/PriceRadar.Api/wwwroot/*`, `README.md`, `docs/evidence/demo.gif`, `docs/ai-usage.md` (long form, optional).
 
+**Measured result (2026-11-04).** `index.html` + `app.js` + `app.css` (vanilla, no inline script, light and dark theme, last five checks in `localStorage`). At 360 px: no horizontal scroll, no console errors under the strict CSP; Lighthouse mobile accessibility 100, best practices 100. Lookups answer in 15–35 ms on localhost. Without an author a title is never auto-matched (no-author cap 0.85 < 0.90), so the page shows "Is it this book?" with one tappable candidate that re-runs the lookup with its author. Screenshots: `docs/evidence/ui-*.png`, produced by `docs/evidence/capture_ui.py` instead of a GIF. Not done: a test on a physical phone over Wi-Fi.
+
 **Design decisions today:** D-32.
 
 **Definition of Done**
@@ -1407,6 +1410,8 @@ In Chrome DevTools: device toolbar "Galaxy S8+" (360 px), then a Lighthouse mobi
 - The phone cannot connect → Windows firewall, or Kestrel bound to `localhost` only (in Docker, the port mapping `5080:8080` binds all interfaces).
 - CSP blocks the script → an inline `<script>`; move it to `app.js`.
 - Cyrillic input returns no match → the query string is not URL-encoded; use `URLSearchParams`.
+- Playwright `wait_for_function` throws `EvalError … 'unsafe-eval'` → the page CSP blocks string evaluation; wait on responses or selectors.
+- White text unreadable on the verdict badge in dark mode → the dark palette uses light colours; switch the text colour with the theme (`--on-color`).
 
 **Cut-if-late:** **The UI is first in the cut order.** Fallback: the `.http` file plus Scalar screenshots, and a README note. Never cut the README quick start.
 
