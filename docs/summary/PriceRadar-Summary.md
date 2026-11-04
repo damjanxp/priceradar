@@ -101,7 +101,7 @@ were caught), `docs/spec/PriceRadar-Spec.pdf` (the full specification).
 
 These need you, because they publish things or depend on your accounts:
 
-1. **Push to GitHub.** Days 8–10 are committed locally only (`main` is 3 commits ahead of `origin/main`). Pushing runs
+1. **Push to GitHub.** Days 8–10 and this summary are committed locally only (`git status` shows how far `main` is ahead of `origin/main`). Pushing runs
    the new three-job CI for the first time: check that the `lint`, `build-test` and `docker` jobs go green, and that
    the README's CI badge shows *passing*. CI on GitHub has not been verified yet.
 2. **Tag `v1.0.0` and publish a release** after CI is green; pin the repository and add topics.
