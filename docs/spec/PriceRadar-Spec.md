@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.12 |
+| Version | 1.13 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.13 | 2026-11-04 | D. Petrov / Claude | After the plan: `GET /api/catalog` (current min / median / max asking price, copies on sale, sold proxy, totals), catalogue tab and book card in the web UI, library-theme redesign, `Cache-Control: no-cache` on static files |
 | 1.12 | 2026-11-04 | D. Petrov / Claude | DAY-10 results: clean-clone rehearsal timed, safe rehearsal commands (pinned compose name), Appendix B filled with measured values |
 | 1.11 | 2026-11-04 | D. Petrov / Claude | DAY-9 results: lookup page, measured Lighthouse score, single-candidate wording, README and AI-usage log; two failure symptoms |
 | 1.10 | 2026-11-04 | D. Petrov / Claude | DAY-8 results: architecture tests, three-job CI with gitleaks and coverage summary, correlation id, measured coverage, debugging log; two failure symptoms |

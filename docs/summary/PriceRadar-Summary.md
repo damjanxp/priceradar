@@ -21,14 +21,12 @@ optimisation, honest matching quality numbers, tests against a real database, CI
 | **Matching** | Normalises text (Cyrillic → Latin, diacritics, noise words like "kao nova", years, roman volume numbers), finds candidate books, scores `0.7·title + 0.3·author`. ≥ 0.90 → automatic match; < 0.65 → new book; in between → Claude API, cached so each distinct string is asked at most once, with a budget cap. |
 | **Sold proxy** | A listing missing from two runs in a row is marked *Disappeared*. Probably sold, but not certain, and the app says so. |
 | **Verdict** | `GET /api/lookup` compares your price with the 25th–75th percentile of the last 30 days: **cheap / fair / expensive**, or *not enough data* below 3 listings. |
-| **Phone page** | `http://localhost:5080/`: three fields, a big coloured verdict, the stats behind it, a "which book?" step when the match is unclear. |
+| **Web UI** | `http://localhost:5080/`, in a library theme (light and dark). *Price check:* three fields, a rubber-stamp verdict, a price scale with your price marked, the stats behind it, a "which book?" step when the match is unclear. *Catalogue:* every book as a catalogue card with its median asking price, range and copies on sale; search, sort, and a card per book with a six-month price chart and the cheapest copies. |
 | **REST API** | Books, stats, price history, ingestion runs; RFC 9457 error responses, API key for writes, rate limits, health checks, OpenAPI/Scalar. |
 
 <div class="shots">
-  <img src="../evidence/ui-cheap.png" alt="Cheap">
-  <img src="../evidence/ui-fair.png" alt="Fair">
-  <img src="../evidence/ui-ambiguous.png" alt="Ambiguous">
-  <img src="../evidence/ui-cheap-dark.png" alt="Dark mode">
+  <img class="wide" src="../evidence/ui-desktop-check.png" alt="Price check with a cheap verdict">
+  <img class="wide" src="../evidence/ui-desktop-catalog-dark.png" alt="Catalogue in dark mode">
 </div>
 
 ## 3. What was done, day by day
@@ -45,8 +43,9 @@ optimisation, honest matching quality numbers, tests against a real database, CI
 | 8 | Architecture tests, full CI (gitleaks, format, tests + coverage, Docker), correlation ids, debugging log | 221 tests, 94.7 % line coverage |
 | 9 | Phone lookup page, full README, AI-usage log, MIT licence | Lighthouse accessibility 100 |
 | 10 | Clean-clone rehearsal, CV bullets with real numbers, final polish | Fresh clone running in ~2.5 min |
+| + | Library-theme redesign, catalogue tab and `GET /api/catalog`, book cards with price history | Lighthouse 100 / 100 on both tabs |
 
-**Final numbers:** 186 unit + 35 integration tests, all green · line coverage 94.7 % (Core 87.3 %) · hot-book stats
+**Final numbers:** 186 unit + 37 integration tests, all green · line coverage 94.7 % (Core 87.3 %) · hot-book stats
 5 ms / 49 reads on 500k rows · lookup p95 18.5 ms at 838 req/s · matching precision 100 %, recall 88.7 % · 0 build
 warnings, `dotnet format` clean.
 
@@ -82,13 +81,16 @@ A new run with the same fixture set is refused while another run of that source 
 | Проклета авлија | Андрић | 450 | Cheap (Cyrillic works) |
 | Derviš i smrt | *(empty)* | 500 | "Is it this book?" → tap the candidate → Fair price |
 
+Then open the **Catalogue** tab (<http://localhost:5080/#/catalog>): search "andrić" or "андрић", order by median
+price, untick *Only books on sale now* to see all 20,018 books, and click any card to open its price history.
+
 From your phone on the same Wi-Fi: `ipconfig` shows your PC's IPv4 address; open `http://<that-ip>:5080/` (Windows
 may ask to allow port 5080 through the firewall).
 
 **Step 4: run the tests** (Docker must be running for the integration tests):
 
 ```powershell
-dotnet test -c Release           # expect 186 + 35 passed
+dotnet test -c Release           # expect 186 + 37 passed
 ```
 
 **Step 5: look at the evidence.** `README.md` (overview and numbers), `docs/benchmarks/BENCHMARKS.md` (SQL
@@ -101,9 +103,8 @@ were caught), `docs/spec/PriceRadar-Spec.pdf` (the full specification).
 
 These need you, because they publish things or depend on your accounts:
 
-1. **Push to GitHub.** Days 8–10 and this summary are committed locally only (`git status` shows how far `main` is ahead of `origin/main`). Pushing runs
-   the new three-job CI for the first time: check that the `lint`, `build-test` and `docker` jobs go green, and that
-   the README's CI badge shows *passing*. CI on GitHub has not been verified yet.
+1. **Push the latest work.** Days 1–10 are on GitHub and the first run of the three-job CI (`lint`, `build-test`,
+   `docker`) passed. The library-theme redesign and the catalogue are not pushed yet.
 2. **Tag `v1.0.0` and publish a release** after CI is green; pin the repository and add topics.
 3. **Try it on a real phone** over Wi-Fi (only tested at 360 px in a phone-sized browser so far).
 4. **Enable Claude resolution** if you want it: put an Anthropic API key in `.env` as `ANTHROPIC_API_KEY` (never

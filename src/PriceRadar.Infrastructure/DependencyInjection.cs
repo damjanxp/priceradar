@@ -63,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<IngestionService>();
         services.AddTransient<BookStatsQuery>();
         services.AddTransient<BookSearchQuery>();
+        services.AddTransient<CatalogQuery>();
         services.AddScoped<LookupService>();
         services.AddPriceRadarHangfire(connectionString);
 

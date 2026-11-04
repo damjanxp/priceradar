@@ -15,6 +15,13 @@ GET {{base}}/api/books?q=АНДРИЋ&sort=-listingCount
 ###
 GET {{base}}/api/books?sort=-lastSeen&pageSize=3
 
+### Catalogue: books with copies on sale now, min / median / max asking price, sold proxy; totals for the drawer
+GET {{base}}/api/catalog
+###
+GET {{base}}/api/catalog?q=andric&sort=median
+###
+GET {{base}}/api/catalog?inStock=false&sort=-median&page=2&pageSize=10
+
 ### Book detail
 GET {{base}}/api/books/1
 ### 404 ProblemDetails

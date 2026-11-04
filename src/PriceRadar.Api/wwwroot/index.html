@@ -3,46 +3,111 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1d4e89">
-  <meta name="description" content="Is this used book's price cheap, fair or expensive? Compares an asking price with listings on Serbian marketplaces.">
-  <title>PriceRadar — used-book price check</title>
+  <meta name="theme-color" content="#2f4a3a">
+  <meta name="description" content="Is this used book's price cheap, fair or expensive? A price register for used books on Serbian marketplaces.">
+  <title>PriceRadar — used-book price register</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
-  <main class="wrap">
-    <header>
-      <h1>PriceRadar</h1>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="eyebrow">Antikvarijat &middot; price register</p>
+      <h1><span class="mark" aria-hidden="true">&#10086;</span> PriceRadar</h1>
       <p class="tagline">Is the price at this stall a good deal? <span lang="sr">Da li je cena dobra?</span></p>
-    </header>
+    </div>
+    <div class="shelf" aria-hidden="true"></div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <a class="tab" role="tab" id="tab-check" href="#/check" aria-controls="view-check">Price check</a>
+      <a class="tab" role="tab" id="tab-catalog" href="#/catalog" aria-controls="view-catalog">Catalogue</a>
+    </nav>
+  </header>
 
-    <form id="lookup" novalidate>
-      <label for="title">Title <span class="hint">Latin or Cyrillic, typos are fine</span></label>
-      <input id="title" name="title" type="text" required minlength="2" maxlength="300" autocomplete="off"
-             autocapitalize="sentences" placeholder="Na Drini ćuprija">
+  <main id="main" class="wrap">
+    <!-- Price check -->
+    <section id="view-check" class="view" role="tabpanel" aria-labelledby="tab-check">
+      <form id="lookup" class="index-card" novalidate>
+        <h2 class="card-title">Look up a book</h2>
+        <div class="field">
+          <label for="title">Title <span class="hint">Latin or Cyrillic, typos are fine</span></label>
+          <input id="title" name="title" type="text" required minlength="2" maxlength="300" autocomplete="off"
+                 autocapitalize="sentences" placeholder="Na Drini ćuprija">
+        </div>
+        <div class="field">
+          <label for="author">Author <span class="hint">optional, makes the match surer</span></label>
+          <input id="author" name="author" type="text" maxlength="200" autocomplete="off" placeholder="Ivo Andrić">
+        </div>
+        <div class="field">
+          <label for="price">Asking price</label>
+          <div class="price-input">
+            <input id="price" name="askingPrice" type="text" inputmode="numeric" pattern="[0-9]*" required placeholder="400">
+            <span class="unit" aria-hidden="true">RSD</span>
+          </div>
+        </div>
+        <button id="submit" class="btn btn-primary" type="submit">Check the price</button>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+      </form>
 
-      <label for="author">Author <span class="hint">optional, but makes the match surer</span></label>
-      <input id="author" name="author" type="text" maxlength="200" autocomplete="off" placeholder="Ivo Andrić">
+      <section id="intro" class="result intro">
+        <h2 class="card-title">How the register works</h2>
+        <ol class="steps">
+          <li><strong>Write down what the stall has:</strong> the title, the author if you can see it, and the asking price.</li>
+          <li><strong>PriceRadar finds the book</strong> among the listings it has collected, whatever the spelling or alphabet.</li>
+          <li><strong>It stamps a verdict:</strong> <span class="ink cheap">cheap</span> at or below the cheapest quarter of recent
+            prices, <span class="ink expensive">expensive</span> above the dearest quarter, <span class="ink fair">fair</span> in between.</li>
+        </ol>
+        <p class="intro-note">Not sure of the title? Browse the <a href="#/catalog">catalogue</a> and open a book's card.</p>
+      </section>
+      <section id="result" class="result" aria-live="polite" hidden></section>
 
-      <label for="price">Asking price (RSD)</label>
-      <input id="price" name="askingPrice" type="text" inputmode="numeric" pattern="[0-9]*" required placeholder="400">
+      <details class="recent" id="recent-box" hidden>
+        <summary>Recent checks</summary>
+        <ul id="recent"></ul>
+      </details>
+    </section>
 
-      <button id="submit" type="submit">Check price</button>
-      <p id="form-error" class="form-error" role="alert" hidden></p>
-    </form>
+    <!-- Catalogue -->
+    <section id="view-catalog" class="view" role="tabpanel" aria-labelledby="tab-catalog" hidden>
+      <div class="ledger" id="totals" aria-live="polite"></div>
 
-    <section id="result" aria-live="polite" hidden></section>
+      <form id="catalog-filters" class="filters" role="search">
+        <div class="field grow">
+          <label for="q">Search the catalogue</label>
+          <input id="q" name="q" type="search" maxlength="100" autocomplete="off" placeholder="Title or author: andrić, seobe…">
+        </div>
+        <div class="field">
+          <label for="sort">Order by</label>
+          <select id="sort" name="sort">
+            <option value="-active">Most copies on sale</option>
+            <option value="title">Title A–Z</option>
+            <option value="median">Median price, lowest first</option>
+            <option value="-median">Median price, highest first</option>
+            <option value="-lastSeen">Recently seen</option>
+          </select>
+        </div>
+        <label class="check">
+          <input id="instock" name="inStock" type="checkbox" checked>
+          <span>Only books on sale now</span>
+        </label>
+      </form>
 
-    <details class="recent" id="recent-box" hidden>
-      <summary>Recent checks</summary>
-      <ul id="recent"></ul>
-    </details>
-
-    <footer>
-      Compares your price with listings seen in the last 30 days. "Disappeared" is a sold proxy, not confirmed sales.
-      <a href="/scalar">API</a>
-    </footer>
+      <p id="catalog-status" class="catalog-status" role="status"></p>
+      <ol id="catalog" class="catalog"></ol>
+      <button id="more" class="btn btn-quiet" type="button" hidden>Show more books</button>
+    </section>
   </main>
+
+  <dialog id="book" class="book-dialog" aria-labelledby="book-title">
+    <div class="dialog-body" id="book-body"></div>
+  </dialog>
+
+  <footer class="colophon">
+    <p>Prices are asking prices from marketplace listings. <em>Disappeared</em> is a sold proxy, not confirmed sales.</p>
+    <p><a href="/scalar">API reference</a> &middot; <a href="/hangfire">Job dashboard</a></p>
+  </footer>
+
   <script src="app.js"></script>
 </body>
 </html>

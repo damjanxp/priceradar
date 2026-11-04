@@ -494,6 +494,105 @@
         }
       }
     },
+    "/api/catalog": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 2,
+              "type": "string"
+            }
+          },
+          {
+            "name": "inStock",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 100000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 24
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "pattern": "^(title|-active|median|-median|-lastSeen)$",
+              "type": "string",
+              "default": "-active"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogPage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogPage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/ingestion/runs": {
       "post": {
         "tags": [
@@ -1162,6 +1261,126 @@
           }
         }
       },
+      "CatalogItem": {
+        "required": [
+          "bookId",
+          "title",
+          "author",
+          "activeListings",
+          "disappearedListings",
+          "minPrice",
+          "medianPrice",
+          "maxPrice",
+          "lastSeenAtUtc",
+          "sources"
+        ],
+        "type": "object",
+        "properties": {
+          "bookId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string",
+            "nullable": true
+          },
+          "activeListings": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "disappearedListings": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "medianPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "maxPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "lastSeenAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "sources": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CatalogPage": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totals"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogItem"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/CatalogTotals"
+          }
+        }
+      },
+      "CatalogTotals": {
+        "required": [
+          "books",
+          "booksInStock",
+          "activeListings",
+          "disappearedListings"
+        ],
+        "type": "object",
+        "properties": {
+          "books": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "booksInStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activeListings": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "disappearedListings": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "CreateRunRequest": {
         "required": [
           "source"
@@ -1267,6 +1486,7 @@
           "bookId",
           "title",
           "author",
+          "score",
           "activeListings"
         ],
         "type": "object",
@@ -1281,6 +1501,10 @@
           "author": {
             "type": "string",
             "nullable": true
+          },
+          "score": {
+            "type": "number",
+            "format": "double"
           },
           "activeListings": {
             "type": "integer",
@@ -1703,6 +1927,9 @@
   "tags": [
     {
       "name": "Books"
+    },
+    {
+      "name": "Catalog"
     },
     {
       "name": "IngestionRuns"

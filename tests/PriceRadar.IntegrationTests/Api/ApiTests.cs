@@ -116,6 +116,69 @@ public sealed class ApiTests(MsSqlFixture sql) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Catalog_ListsBooksWithCurrentPricesQuantitiesAndTotals()
+    {
+        int andric;
+        await using (var db = sql.CreateDbContext())
+        {
+            var data = new TestData(db);   // one instance: it numbers the listings' external ids
+            var drina = await data.BookAsync("Na Drini ćuprija", "Ivo Andrić");
+            foreach (var price in new[] { 100m, 200m, 300m, 400m })
+            {
+                await data.ListingAsync(drina, (DateTime.UtcNow.AddDays(-2), price));
+            }
+
+            andric = drina.BookId;
+            var seobe = await data.BookAsync("Seobe", "Miloš Crnjanski");
+            await data.ListingAsync(seobe, (DateTime.UtcNow.AddDays(-1), 900m));
+            var gone = await data.ListingAsync(seobe, (DateTime.UtcNow.AddDays(-5), 700m));
+            await data.DisappearAsync(gone, DateTime.UtcNow.AddDays(-3));
+            await data.BookAsync("Pesme", "Desanka Maksimović");   // nothing ever listed
+        }
+
+        var page = await JsonAsync(await _client.GetAsync("/api/catalog"));
+
+        page.GetProperty("totalCount").GetInt32().ShouldBe(2);   // in stock only by default
+        var first = page.GetProperty("items")[0];
+        first.GetProperty("bookId").GetInt32().ShouldBe(andric);   // default order: most copies on sale
+        first.GetProperty("activeListings").GetInt32().ShouldBe(4);
+        (first.GetProperty("minPrice").GetDecimal(), first.GetProperty("medianPrice").GetDecimal(), first.GetProperty("maxPrice").GetDecimal())
+            .ShouldBe((100m, 250m, 400m));
+        first.GetProperty("sources").GetString().ShouldBe("fixture");
+
+        var seobeRow = page.GetProperty("items")[1];
+        // The disappeared copy counts as gone and is left out of the current prices.
+        (seobeRow.GetProperty("activeListings").GetInt32(), seobeRow.GetProperty("disappearedListings").GetInt32()).ShouldBe((1, 1));
+        seobeRow.GetProperty("medianPrice").GetDecimal().ShouldBe(900m);
+
+        var totals = page.GetProperty("totals");
+        (totals.GetProperty("books").GetInt32(), totals.GetProperty("booksInStock").GetInt32(),
+            totals.GetProperty("activeListings").GetInt32(), totals.GetProperty("disappearedListings").GetInt32()).ShouldBe((3, 2, 5, 1));
+
+        var all = await JsonAsync(await _client.GetAsync("/api/catalog?inStock=false&sort=-median"));
+        all.GetProperty("totalCount").GetInt32().ShouldBe(3);
+        var titles = all.GetProperty("items").EnumerateArray().Select(i => i.GetProperty("title").GetString()).ToList();
+        titles.ShouldBe(["Seobe", "Na Drini ćuprija", "Pesme"]);   // books without a price sort last
+
+        var search = await JsonAsync(await _client.GetAsync("/api/catalog?q=ЦРЊАНСКИ"));
+        search.GetProperty("items").GetArrayLength().ShouldBe(1);
+        search.GetProperty("items")[0].GetProperty("title").GetString().ShouldBe("Seobe");
+
+        // A page past the end is empty but still reports the total.
+        var beyond = await JsonAsync(await _client.GetAsync("/api/catalog?page=5&pageSize=1"));
+        (beyond.GetProperty("items").GetArrayLength(), beyond.GetProperty("totalCount").GetInt32()).ShouldBe((0, 2));
+    }
+
+    [Fact]
+    public async Task Catalog_InvalidSort_Returns400ProblemDetails()
+    {
+        var response = await _client.GetAsync("/api/catalog?sort=price;drop");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await JsonAsync(response)).GetProperty("errors").TryGetProperty("sort", out _).ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Books_SearchStatsListingsAndHistory_ReturnSpecShapes()
     {
         var bookId = await SeedAndricAsync();

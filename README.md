@@ -9,9 +9,12 @@
 marketplaces into a small data warehouse and answers that question from your phone in about 20 ms.
 
 <p>
-  <img src="docs/evidence/ui-cheap.png" width="190" alt="Cheap verdict">
-  <img src="docs/evidence/ui-expensive.png" width="190" alt="Expensive verdict">
+  <img src="docs/evidence/ui-desktop-catalog.png" width="780" alt="The catalogue: every book with its median asking price, price range and copies on sale">
+</p>
+<p>
+  <img src="docs/evidence/ui-fair.png" width="190" alt="Fair price verdict stamped on the phone">
   <img src="docs/evidence/ui-ambiguous.png" width="190" alt="Ambiguous match with a candidate to confirm">
+  <img src="docs/evidence/ui-book-phone.png" width="190" alt="A book's catalogue card with price history">
   <img src="docs/evidence/ui-cheap-dark.png" width="190" alt="Dark mode">
 </p>
 
@@ -34,7 +37,10 @@ canonical book with a price distribution and a verdict.
 - **Stores history** in a star-schema warehouse (`dw.PriceSnapshot`, one row per listing per run) and tracks when a
   listing disappears as a *sold proxy*.
 - **Answers** `GET /api/lookup?title=&author=&askingPrice=` with *cheap / fair / expensive* against the 25th–75th
-  percentile of the last 30 days, plus the stats behind it. A mobile page at `/` calls it.
+  percentile of the last 30 days, plus the stats behind it.
+- **Browses** the whole collection in a card catalogue (`GET /api/catalog`): search in Latin or Cyrillic, sort by
+  copies on sale or median price, and open any book's card for its 30-day figures, a six-month price chart and the
+  cheapest copies on sale. The web UI at `/` (vanilla JS, library theme, light and dark) has both tabs.
 - **Exposes** books, price history and ingestion runs as a REST API with RFC 9457 errors, API-key protection for writes,
   rate limiting, health checks and OpenAPI.
 
@@ -44,10 +50,10 @@ canonical book with a price distribution and a verdict.
 |---|---|
 | `src/PriceRadar.Core` | Normalisation, matching, verdict rules. No I/O, no framework dependencies (enforced by tests). |
 | `src/PriceRadar.Infrastructure` | EF Core model and migrations, SQL procedures, Dapper queries, sources, Hangfire jobs, Claude client. |
-| `src/PriceRadar.Api` | ASP.NET Core Web API, the lookup page (`wwwroot`), Hangfire dashboard, health checks. |
+| `src/PriceRadar.Api` | ASP.NET Core Web API, the web UI (`wwwroot`: price check and catalogue), Hangfire dashboard, health checks. |
 | `src/PriceRadar.Worker` | Worker Service hosting the Hangfire server that runs the jobs. |
 | `tools/PriceRadar.Seeder` | Generates a reproducible synthetic warehouse (20k books, 60k listings, 500k snapshots). |
-| `tests/*` | 186 unit tests (xUnit, Shouldly, NetArchTest) and 35 integration tests (Testcontainers SQL Server). |
+| `tests/*` | 186 unit tests (xUnit, Shouldly, NetArchTest) and 37 integration tests (Testcontainers SQL Server). |
 
 ## Quick start
 
@@ -74,7 +80,8 @@ dotnet run --project tools/PriceRadar.Seeder -c Release -- seed --seed 42 --rese
 
 Then ask:
 
-- Phone page: <http://localhost:5080/> (from a phone on the same Wi-Fi: `http://<pc-ip>:5080/`)
+- Web UI: <http://localhost:5080/> for the price check, <http://localhost:5080/#/catalog> for the catalogue
+  (from a phone on the same Wi-Fi: `http://<pc-ip>:5080/`)
 - API: `curl.exe -s "http://localhost:5080/api/lookup?title=Prokleta%20avlija&author=Andric&askingPrice=600"`
 - API reference: <http://localhost:5080/scalar>, or the requests in `src/PriceRadar.Api/PriceRadar.Api.http`
 
@@ -160,13 +167,13 @@ python docs/evidence/capture_ui.py                        # phone screenshots of
 | Layer | Count | What it proves |
 |---|---|---|
 | Unit | 186 | Normaliser, scorer, decider, verdict rules, golden set, architecture rules (Core has no I/O dependencies, controllers contain no SQL) |
-| Integration | 35 | Full pipeline on a real SQL Server: idempotent re-runs, sold heuristic, stats procedures, AI cache, API contract and errors, API key, correlation id |
+| Integration | 37 | Full pipeline on a real SQL Server: idempotent re-runs, sold heuristic, stats procedures, catalogue, AI cache, API contract and errors, API key, correlation id |
 
 Line coverage over both suites is 94.7 % (Core 87.3 %). CI runs three jobs on every push: **lint** (gitleaks secret
 scan, `dotnet format`), **build-test** (all tests with coverage summary), **docker** (both images build).
 
-The lookup page scores 100 for accessibility and best practices in a Lighthouse mobile run, has no horizontal scroll at
-360 px and works under a strict `default-src 'self'` Content Security Policy.
+Both tabs of the web UI score 100 for accessibility and best practices in a Lighthouse mobile run, have no
+horizontal scroll at 360 px and work under a strict `default-src 'self'` Content Security Policy.
 
 ## Ethics and limitations
 

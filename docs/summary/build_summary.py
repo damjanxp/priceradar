@@ -20,12 +20,13 @@ PDF_PATH = HERE / "PriceRadar-Summary.pdf"
 SPEC_CSS = HERE.parent / "spec" / "tools" / "spec.css"
 
 EXTRA_CSS = """
-body { font-size: 9.5pt; }
+body { font-size: 9.2pt; }
 h1 { font-size: 20pt; color: var(--accent); margin: 0 0 2pt; }
 h1 + p em { color: var(--muted); }
 h2 { break-before: auto !important; page-break-before: auto !important; margin-top: 12pt; }
 .shots { display: flex; gap: 6mm; justify-content: center; margin: 6pt 0 4pt; break-inside: avoid; }
 .shots img { width: 29mm; border: 1px solid var(--rule); border-radius: 3mm; }
+.shots img.wide { width: 86mm; border-radius: 1.5mm; }
 table { break-inside: auto; }
 tr { break-inside: avoid; }
 """

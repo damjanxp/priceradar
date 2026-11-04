@@ -55,7 +55,11 @@ try
     app.UseStatusCodePages();
     app.UseRateLimiter();
     app.UseDefaultFiles();   // GET / serves wwwroot/index.html, the mobile lookup page (FR-16)
-    app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        // Revalidate on every load (ETag → 304), so a new app.js/app.css is picked up right after a deploy.
+        OnPrepareResponse = ctx => ctx.Context.Response.Headers.CacheControl = "no-cache",
+    });
 
     if (app.Environment.IsDevelopment())
     {
