@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | PriceRadar Technical Specification (MVP) |
-| Version | 1.11 |
+| Version | 1.12 |
 | Status | Approved for implementation; the pre-Day-1 decisions in §1.3 are confirmed |
 | Date | 2026-10-28 |
 | Author | Damjan Petrov (FTN Novi Sad) — with Claude Code as AI pair-architect |
@@ -22,6 +22,7 @@
 | 1.0 | 2026-10-28 | D. Petrov / Claude | QA pass on PDF layout; Decision Log completed |
 | 1.1 | 2026-10-28 | D. Petrov / Claude | Open questions in §1.3 confirmed; D-37 and D-38 added |
 | 1.2 | 2026-10-28 | D. Petrov / Claude | DAY-1 commands corrected after the first run (local dotnet-ef manifest, user-secrets step, two failure symptoms) |
+| 1.12 | 2026-11-04 | D. Petrov / Claude | DAY-10 results: clean-clone rehearsal timed, safe rehearsal commands (pinned compose name), Appendix B filled with measured values |
 | 1.11 | 2026-11-04 | D. Petrov / Claude | DAY-9 results: lookup page, measured Lighthouse score, single-candidate wording, README and AI-usage log; two failure symptoms |
 | 1.10 | 2026-11-04 | D. Petrov / Claude | DAY-8 results: architecture tests, three-job CI with gitleaks and coverage summary, correlation id, measured coverage, debugging log; two failure symptoms |
 | 1.9 | 2026-11-03 | D. Petrov / Claude | DAY-7 results: golden-set metrics and grid, same-author candidate fallback, roman volume numerals (N7b), document-frequency stop rule, cached Error answers, lookup methods, two failure symptoms |
@@ -1446,17 +1447,23 @@ In Chrome DevTools: device toolbar "Galaxy S8+" (360 px), then a Lighthouse mobi
 ```powershell
 cd $env:TEMP; git clone https://github.com/<user>/priceradar.git pr-check; cd pr-check
 Copy-Item .env.example .env   # set password
-Measure-Command { docker compose up -d --build } | Select-Object TotalMinutes
+# docker-compose.yml pins name: priceradar and the container names. In a second checkout, stop the main stack,
+# rename its containers (docker rename priceradar-sql priceradar-sql-orig, etc.) and use another project name,
+# otherwise "down -v" below deletes the MAIN checkout's database volume.
+Measure-Command { docker compose -p pr-check up -d --build } | Select-Object TotalMinutes
+$env:ConnectionStrings__Sql = "Server=localhost,14333;Database=PriceRadar;User Id=sa;Password=<from .env>;TrustServerCertificate=True"
 dotnet run --project tools/PriceRadar.Seeder -c Release -- seed --seed 42
 curl.exe -s "http://localhost:5080/api/lookup?title=Na%20Drini%20cuprija&author=Ivo%20Andric&askingPrice=400"
-docker compose down -v
+docker compose -p pr-check down -v
 ```
 
 Final smoke checklist: `/health/ready` Healthy · one fixture run Succeeded · lookup returns a verdict · `/hangfire` reachable · CI badge passing · no secrets (`gitleaks detect`).
 
 **Evidence:** the timing output; the release page; a screenshot of the final CI run on the tag.
 
-**Likely failures → usual cause:** a missing `.env` step in the README; a migration that relied on local state; a hard-coded `localhost` connection string inside a container (must be `sql,1433`).
+**Measured result (2026-11-04).** Fresh local clone of `bda5fae`: build + 186 unit tests 21 s; `docker compose up -d --build` 2 min 1 s to a healthy Api; three fixture runs Succeeded, lookup returned `fair`, `/` served the page; the seed reproduced the benchmark dataset exactly (hot book 6442 with 8,275 snapshots) in 14.6 s. Total well under 10 minutes. Not done here (they need GitHub and are the owner's call): pushing, the `v1.0.0` tag and release, CI on the tag, the application.
+
+**Likely failures → usual cause:** `docker compose down -v` in a second checkout deletes the main database → the compose file pins `name: priceradar`; use `-p <other>`. `docker compose stop` ends SQL Server with exit 137 → it does not act on SIGTERM; a longer `stop_grace_period` does not help. A missing `.env` step in the README; a migration that relied on local state; a hard-coded `localhost` connection string inside a container (must be `sql,1433`).
 
 **Cut-if-late:** The Stretch item and the cover-letter polish. **Never cut** the clean-clone rehearsal.
 
@@ -1556,14 +1563,14 @@ Final smoke checklist: `/health/ready` Healthy · one fixture run Succeeded · l
 
 ## Appendix B — Draft CV bullets
 
-Replace every `[X]` with the measured value from `docs/benchmarks/BENCHMARKS.md`, the CI output or the SQL queries. Do not round in your favour.
+Filled on DAY-10 with measured values; each traces to `docs/benchmarks/BENCHMARKS.md`, the test output or the golden-set test. Values that could not be measured are said to be unmeasured.
 
-- Built **PriceRadar**, a .NET 9 / C# 13 market-price intelligence system (ASP.NET Core Web API, Worker Service, Hangfire, SQL Server 2022, Docker) that ingests marketplace listings into a staging → warehouse model and answers "is this price cheap?" in **[X] ms p95**.
-- Reduced the book-statistics stored procedure from **[X] ms / [X] logical reads to [Y] ms / [Y] reads** on **500k** fact rows by designing a covering index and resolving a parameter-sniffing regression found through actual execution plans and Query Store.
-- Designed Serbian-aware fuzzy matching (Cyrillic↔Latin transliteration, diacritic folding, token-set similarity) that auto-matches **[X] %** of listings at **[X] %** precision on a 150-pair golden set, escalating only ambiguous cases to the Claude API with a DB cache: **[X] calls for [X] listings, total cost $[X]**.
-- Implemented an idempotent, retryable Hangfire pipeline (scrape → match → resolve → load) with SqlBulkCopy staging (**[X] rows/s**) and set-based MERGE loads, verified by Testcontainers integration tests that re-run jobs without producing duplicates.
-- Established production-style quality gates: **[X]** unit and integration tests (xUnit, Shouldly, Testcontainers), **[X] %** core coverage, and a GitHub Actions pipeline (lint, secret scanning, build, test, Docker build) with RFC 9457 ProblemDetails, rate limiting and structured Serilog logs.
-- Used Claude Code daily as an AI pair programmer, using a written specification as context; documented the prompts that worked and **[X]** cases where AI output was wrong and was caught by tests or review.
+- Built **PriceRadar**, a .NET 9 / C# 13 market-price intelligence system (ASP.NET Core Web API, Worker Service, Hangfire, SQL Server 2022, Docker) that ingests marketplace listings into a staging → warehouse model and answers "is this price cheap?" in **18.5 ms p95** under load (k6, 10 virtual users, 838 req/s).
+- Reduced the book-statistics stored procedure from **21 ms / 6,809 logical reads to 5 ms / 49 reads** on **500k** fact rows, and the price-history query from 55,457 to 56 reads, with a covering index plus an empty filtered columnstore index that enables batch mode; checked parameter sniffing through the plan cache and Query Store.
+- Designed Serbian-aware fuzzy matching (Cyrillic↔Latin transliteration, diacritic folding, roman volume numerals, token-set similarity) that auto-matches **88.7 %** of listings at **100 %** precision on a 169-listing golden set, escalating only the ambiguous **11.8 %** to the Claude API behind a database cache and a per-run/daily budget (live API cost not yet measured).
+- Implemented an idempotent, retryable Hangfire pipeline (scrape → match → resolve → load) with SqlBulkCopy staging (**45–64k rows/s** in the seeder) and set-based MERGE loads, verified by Testcontainers integration tests that re-run jobs without producing duplicates.
+- Established production-style quality gates: **221** unit and integration tests (xUnit, Shouldly, Testcontainers, NetArchTest), **94.7 %** line coverage (**87.3 %** in Core), and a GitHub Actions pipeline (gitleaks, `dotnet format`, build, test with coverage summary, Docker build) with RFC 9457 ProblemDetails, rate limiting, correlation ids and structured Serilog logs.
+- Used Claude Code daily as an AI pair programmer, using a written specification as context; documented the prompts that worked and **9** cases where AI output was wrong and was caught by tests, measurements or review (`docs/ai-usage.md`).
 
 ## Appendix C — Glossary
 

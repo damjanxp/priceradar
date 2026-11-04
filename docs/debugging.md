@@ -87,6 +87,10 @@ echoed in every response and pushed into every log line (`CorrelationIdMiddlewar
 the night before lost the cache, so the identity advanced by 10,000. `DELETE` keeps identity values and
 `DBCC CHECKIDENT … RESEED` without a value never lowers them.
 
+**Follow-up (DAY-10).** `docker compose stop` ends `priceradar-sql` with exit code 137 even with
+`stop_grace_period: 60s`: in this setup the server does not act on SIGTERM and is killed after the grace period, so
+the longer period was reverted. For a clean shutdown run `SHUTDOWN` through `sqlcmd` before stopping.
+
 **Fix.** `seed --reset` now runs `DBCC CHECKIDENT (…, RESEED, 0)` for every pipeline table, so seeded ids are
 reproducible. Gaps in identity values are otherwise harmless and are not "fixed" anywhere else.
 
